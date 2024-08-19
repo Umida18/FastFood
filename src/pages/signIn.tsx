@@ -10,11 +10,13 @@ import {
   message,
 } from "antd";
 import img1 from "../img/signIn.png";
+import { useNavigate } from "react-router";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     // if (email !== password) {
@@ -37,6 +39,8 @@ const SignIn = () => {
       const data = await response.json();
       if (response.ok) {
         message.success("Successfully signed in");
+
+        navigate("/buyurtmalar");
       } else {
         message.error(data.message || "Sign in failed");
       }
