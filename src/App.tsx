@@ -16,10 +16,9 @@ function App() {
     <BrowserRouter>
       <ConfigProvider>
         <Routes>
-          <Route path="/" element={<SignIn />}></Route>
+          <Route path="/login" element={<SignIn />}></Route>
         </Routes>
       </ConfigProvider>
-      <SignIn />
       <Routes>
         <Route
           path="/"
