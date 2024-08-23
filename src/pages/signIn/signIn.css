@@ -1,0 +1,14 @@
+.selectedInput {
+  border-left: 3px solid #fcb600;
+}
+.ant-input:focus {
+  border-color: transparent !important; /* Remove border color */
+  box-shadow: none !important; /* Remove the focus outline/shadow */
+  outline: none !important; /* Remove outline */
+}
+.ant-form-item {
+  margin-bottom: 0px !important;
+}
+.ant-divider-horizontal {
+  margin: 5px !important;
+}
