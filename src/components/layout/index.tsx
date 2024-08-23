@@ -11,77 +11,105 @@ import { BiBell } from "react-icons/bi";
 import { TfiLayoutMediaOverlay } from "react-icons/tfi";
 import { TfiLocationPin } from "react-icons/tfi";
 import { IoExitOutline } from "react-icons/io5";
-
 import { Layout as AntLayout, Menu, theme } from "antd";
 import { Link } from "react-router-dom";
-
+import { render } from "@testing-library/react";
+import "./style.css";
+import bitmap from "./Bitmap.png";
 const { Header, Content, Footer, Sider } = AntLayout;
 
 const items = [
   {
     key: "Buyurtmalar",
-    icon: <FaRegCircleCheck />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <FaRegCircleCheck className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/buyurtmalar">Buyurtmalar</Link>,
   },
   {
     key: "Maxsulotlar",
-    icon: <HiOutlineArchiveBox />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <HiOutlineArchiveBox className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/maxsulotlar">Maxsulotlar</Link>,
   },
   {
     key: "Kategoriyalar",
-    icon: <VscChecklist />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <VscChecklist className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/kategoriyalar">Kategoriyalar</Link>,
   },
   {
     key: "Filiallar",
-    icon: <IoLocationOutline />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <IoLocationOutline className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/filiallar">Filiallar</Link>,
   },
   {
     key: "Mijozlar",
-    icon: <MdOutlinePeopleAlt />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <MdOutlinePeopleAlt className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/mijozlar">Mijozlar</Link>,
   },
   {
     key: "Xisobot",
-    icon: <LuBarChart2 />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <LuBarChart2 className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/xisobot">Xisobot</Link>,
   },
   {
     key: "Hodimlar",
-    icon: <FaPeopleGroup />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <FaPeopleGroup className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/hodimlar">Hodimlar</Link>,
   },
   {
     key: "LavozimSozlamalari",
-    icon: <IoSettingsOutline />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <IoSettingsOutline className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/lavozimSozlamalari">Lavozim Sozlamalari</Link>,
   },
-  {
-    key: "Bildirishnoma",
-    icon: <BiBell />,
-    label: <Link to="/bildirishnoma">Bildirishnoma</Link>,
-  },
+
   {
     key: "YetkazishNarxi",
-    icon: <HiOutlineArchiveBox />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <HiOutlineArchiveBox className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/yetkazishNarxi">Yetkazish Narxi</Link>,
   },
-  {
-    key: "ShikoyatFikrlar",
-    icon: <TfiLayoutMediaOverlay />,
-    label: <Link to="/shikoyatFikrlar">Shikoyat va Fikrlar</Link>,
-  },
+
   {
     key: "Xarita",
-    icon: <TfiLocationPin />,
+    icon: (
+      <div className="bg-gray-100 rounded p-2">
+        <TfiLocationPin className="text-gray-600" />
+      </div>
+    ),
     label: <Link to="/xarita">Xarita</Link>,
-  },
-  {
-    key: "Chiqish",
-    icon: <IoExitOutline />,
-    label: <Link to="/chiqish">Chiqish</Link>,
   },
 ];
 
@@ -93,8 +121,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <AntLayout>
       <Sider
-        breakpoint="lg"
+        breakpoint="md"
         collapsedWidth="0"
+        className="h-full"
         onBreakpoint={(broken) => {
           console.log(broken);
         }}
@@ -102,12 +131,43 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           console.log(collapsed, type);
         }}
       >
-        <div className="demo-logo-vertical text-yellow">salom</div>
+        <div className="bg-white p-4 flex flex-row align-items-center justify-center gap-2">
+          <div>
+            <img
+              src={bitmap}
+              alt=""
+              width={"40px"}
+              height={"40px"}
+              className="overflow-hidden rounded-full "
+            />
+          </div>
+          <div>
+            <p className="text-[10px] ">Fast Food</p>
+            <p className="text-[8px] ">Online Mahsulotlar sotuvi</p>
+          </div>
+        </div>
         <Menu
           theme="light"
           mode="inline"
           defaultSelectedKeys={["buyurtmalar"]}
           items={items}
+        />
+
+        <Menu
+          theme="light"
+          mode="inline"
+          className="pt-52"
+          items={[
+            {
+              key: "Chiqish",
+              icon: <IoExitOutline />,
+              label: (
+                <div>
+                  <Link to="/chiqish">Chiqish</Link>
+                </div>
+              ),
+            },
+          ]}
         />
       </Sider>
       <AntLayout>
