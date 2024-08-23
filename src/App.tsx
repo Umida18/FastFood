@@ -4,9 +4,8 @@ import { Layout } from "./components/layout";
 import SignIn from "./pages/signIn";
 import { Mahsulotlar } from "./pages/mahsulotlar";
 import { Kategoriyalar } from "./pages/kategoriyalar";
-import { Filiallar } from "./pages/filiallar";
-// import { Buyurtmalar } from "./pages/buyurtmalar";
-import { Mijozlar } from "./pages/mijozlar";
+import Filiallar from "./pages/filiallar";
+import Mijozlar from "./pages/mijozlar";
 import { Xisobot } from "./pages/xisobot";
 import { Buyurtmalar } from "./pages/buyurtmalar";
 
