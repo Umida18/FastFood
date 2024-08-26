@@ -1,0 +1,23 @@
+.ant-table-wrapper .ant-table-tbody > tr {
+  /* border-radius: 10px !important; */
+  /* background-color: red !important; */
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2) !important;
+}
+
+td.ant-table-cell {
+  border-radius: 0 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr > td {
+  border-radius: 0 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody tr {
+  border-radius: 10px !important;
+}
+
+.ant-table-thead {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+}
