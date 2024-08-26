@@ -188,22 +188,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
       <AntLayout>
-        <Header
-          className="headerM"
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-            minHeight: "80px",
-          }}
-        >
-          <div>
-            {headerContent[currentHeader] || <div>Default Header Content</div>}
-          </div>
-        </Header>
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content>
           <div
             style={{
-              padding: 24,
+              // padding: 24,
               minHeight: "100vh",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,

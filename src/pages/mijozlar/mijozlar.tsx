@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import { Table, Button, Input, Modal, Form, Select, Popconfirm } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Input,
+  Drawer,
+  Form,
+  Select,
+  Popconfirm,
+  Typography,
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
@@ -8,6 +17,11 @@ import {
   CheckCircleOutlined,
   StopOutlined,
 } from "@ant-design/icons";
+import "./mijozlar.css";
+import { FaPlus } from "react-icons/fa6";
+import axios from "axios";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiEdit2 } from "react-icons/fi";
 
 const { Option } = Select;
 
@@ -19,44 +33,35 @@ interface Client {
   status: "Aktiv" | "Block";
 }
 
-const initialClients: Client[] = [
-  {
-    key: "1",
-    name: "Dina Glenn",
-    phone: "(+99 893) 461-41-88",
-    orderCount: 3,
-    status: "Aktiv",
-  },
-  {
-    key: "2",
-    name: "Nicolina Lindholm",
-    phone: "(+99 893) 461-41-88",
-    orderCount: 2,
-    status: "Block",
-  },
-  {
-    key: "3",
-    name: "Ekaterina Tankova",
-    phone: "(+99 893) 461-41-88",
-    orderCount: 1,
-    status: "Aktiv",
-  },
-];
-
 const ClientTable: React.FC = () => {
-  const [clients, setClients] = useState<Client[]>(initialClients);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [searchText, setSearchText] = useState("");
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseProd = await axios.get(
+          "https://1f5ffb1c4cd92fe3.mokky.dev/fastfood_mijoz"
+        );
+        setClients(responseProd.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleAddClient = () => {
     setEditingClient(null);
-    setIsModalVisible(true);
+    setIsDrawerVisible(true);
   };
 
   const handleEditClient = (record: Client) => {
     setEditingClient(record);
-    setIsModalVisible(true);
+    setIsDrawerVisible(true);
   };
 
   const handleDeleteClient = (key: string) => {
@@ -73,7 +78,7 @@ const ClientTable: React.FC = () => {
     } else {
       setClients([...clients, { ...values, key: `${clients.length + 1}` }]);
     }
-    setIsModalVisible(false);
+    setIsDrawerVisible(false);
   };
 
   const handleToggleStatus = (key: string) => {
@@ -119,15 +124,12 @@ const ClientTable: React.FC = () => {
             }
             onClick={() => handleToggleStatus(record.key)}
           />
-          <Button
-            icon={<EditOutlined />}
-            onClick={() => handleEditClient(record)}
-          />
+          <Button icon={<FiEdit2 />} onClick={() => handleEditClient(record)} />
           <Popconfirm
             title="Ishonchingiz komilmi?"
             onConfirm={() => handleDeleteClient(record.key)}
           >
-            <Button icon={<DeleteOutlined />} />
+            <Button icon={<RiDeleteBin6Line />} />
           </Popconfirm>
         </span>
       ),
@@ -137,13 +139,24 @@ const ClientTable: React.FC = () => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={handleAddClient}
-        >
-          Yangi mijoz qo'shish
-        </Button>
+        <div className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
+          <div
+            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center"
+            onClick={handleAddClient}
+          >
+            <FaPlus style={{ color: "white", fontSize: "17px" }} />
+          </div>
+          <Typography
+            style={{
+              width: "100px",
+              color: "#2D3A45",
+              lineHeight: "18px",
+              fontWeight: "600px",
+            }}
+          >
+            Yangi mijoz qo'shish
+          </Typography>
+        </div>
         <Input
           prefix={<SearchOutlined />}
           placeholder="Qidirish"
@@ -158,11 +171,11 @@ const ClientTable: React.FC = () => {
         pagination={false}
       />
 
-      <Modal
+      <Drawer
         title={editingClient ? "Mijozni tahrirlash" : "Yangi mijoz qo'shish"}
-        visible={isModalVisible}
-        onCancel={() => setIsModalVisible(false)}
-        footer={null}
+        visible={isDrawerVisible}
+        onClose={() => setIsDrawerVisible(false)}
+        width={400}
       >
         <Form
           initialValues={editingClient || { status: "Aktiv" }}
@@ -208,7 +221,7 @@ const ClientTable: React.FC = () => {
             </Button>
           </Form.Item>
         </Form>
-      </Modal>
+      </Drawer>
     </div>
   );
 };

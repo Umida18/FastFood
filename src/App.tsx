@@ -6,8 +6,8 @@ import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { Maxsulotlar } from "./pages/maxsulotlar/maxsulotlar";
 import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
 
-import Filiallar from "./pages/filiallar";
-import Mijozlar from "./pages/mijozlar";
+import Filiallar from "./pages/filiallar/filiallar";
+import Mijozlar from "./pages/mijozlar/mijozlar";
 import { Xisobot } from "./pages/xisobot";
 import { Buyurtmalar } from "./pages/buyurtmalar";
 import { Xarita } from "./pages/xarita";
