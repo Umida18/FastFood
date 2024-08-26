@@ -173,7 +173,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <Menu
           theme="light"
           mode="inline"
-          className="pt-52"
+          className="pt-36"
           items={[
             {
               key: "Chiqish",
@@ -200,10 +200,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {headerContent[currentHeader] || <div>Default Header Content</div>}
           </div>
         </Header>
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content>
           <div
             style={{
-              padding: 24,
               minHeight: "100vh",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
