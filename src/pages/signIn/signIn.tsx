@@ -12,6 +12,7 @@ import {
 import img1 from "../../img/signIn.png";
 import { useNavigate } from "react-router";
 import "./signIn.css";
+
 const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

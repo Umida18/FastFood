@@ -5,19 +5,24 @@ import SignIn from "./pages/signIn/signIn";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { Maxsulotlar } from "./pages/maxsulotlar/maxsulotlar";
 import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
+
 import Filiallar from "./pages/filiallar/filiallar";
 import Mijozlar from "./pages/mijozlar/mijozlar";
 import { Xisobot } from "./pages/xisobot";
 import { YetkazishNarxi } from "./pages/YetkazishNarxi";
 import { LavozimSozlamalari } from "./pages/lavozimSozlamalari";
 import { Hodimlar } from "./pages/hodimlar";
+<<<<<<< HEAD
 import { Buyurtmalar } from "./pages/buyurtmalar/buyurtmalar";
 import { Xarita } from "./pages/xarita";
+=======
+import { Buyurtmalar } from "./pages/buyurtmalar/buyurmalar";
+>>>>>>> c3088581d59ac3561e2d55b315b4052141085573
 
 function App() {
   return (
     <BrowserRouter>
-      {" "}
+
       <Routes>
         <Route path="/login" element={<SignIn />}></Route>
         <Route

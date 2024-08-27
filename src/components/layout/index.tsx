@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { HiOutlineArchiveBox } from "react-icons/hi2";
 import { VscChecklist } from "react-icons/vsc";
@@ -7,29 +7,21 @@ import { MdOutlinePeopleAlt } from "react-icons/md";
 import { LuBarChart2 } from "react-icons/lu";
 import { FaPeopleGroup } from "react-icons/fa6";
 import { IoSettingsOutline } from "react-icons/io5";
-import { BiBell } from "react-icons/bi";
-import { TfiLayoutMediaOverlay } from "react-icons/tfi";
 import { TfiLocationPin } from "react-icons/tfi";
 import { IoExitOutline } from "react-icons/io5";
-import { FaPlus } from "react-icons/fa6";
-import { CiFilter } from "react-icons/ci";
 import "./index.css";
-import { IoSearchOutline } from "react-icons/io5";
-import {
-  Layout as AntLayout,
-  Input,
-  Menu,
-  Space,
-  Typography,
-  theme,
-} from "antd";
+import { Layout as AntLayout, Menu, theme } from "antd";
 import { Link, useLocation } from "react-router-dom";
+<<<<<<< HEAD
 import Search from "antd/es/input/Search";
 // import { headerContent } from "../headers/header";
+=======
+import { headerContent } from "../headers/header";
+>>>>>>> c3088581d59ac3561e2d55b315b4052141085573
 
-import { render } from "@testing-library/react";
 import "./style.css";
 import bitmap from "./Bitmap.png";
+import axios from "axios";
 const { Header, Content, Footer, Sider } = AntLayout;
 
 const items = [
@@ -126,15 +118,62 @@ const items = [
     label: <Link to="/xarita">Xarita</Link>,
   },
 ];
+interface Category {
+  id: number;
+  MainKateg: number;
+  name: string;
+}
+
+interface SelecCat {
+  [key: string]: string[];
+}
+interface Product {
+  id: number;
+  name: string;
+  type: number;
+  price: string;
+  desc: string;
+  img: string;
+}
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const [searchVal, setSearchVal] = useState("");
+
+  const [dataCat, setDataCat] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseCat = await axios.get(
+          "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
+        );
+        setDataCat(responseCat.data);
+
+        const responseProducts = await axios.get(
+          "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
+        );
+        setProducts(responseProducts.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const location = useLocation();
   const currentHeader = location.pathname;
 
+  const handleSearch = (value: string) => {
+    const filteredProducts = products.filter((prod) =>
+      prod.name.toLowerCase().includes(value.toLowerCase())
+    );
+  };
   return (
     <AntLayout>
       <Sider
@@ -188,6 +227,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
       <AntLayout>
+<<<<<<< HEAD
         {/* <Header
           className="headerM"
           style={{
@@ -200,12 +240,17 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {headerContent[currentHeader] || <div>Default Header Content</div>}
           </div> 
         </Header> */}
+=======
+      
+
+>>>>>>> c3088581d59ac3561e2d55b315b4052141085573
         <Content>
           <div
             style={{
               minHeight: "100vh",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
+              backgroundColor: "#edeff3",
             }}
           >
             {children}
