@@ -51,10 +51,14 @@ interface SelecCat {
   [key: string]: string[];
 }
 
-export const MaxsulotHeader = () => {
+export const MaxsulotHeader = ({
+  onSearch,
+}: {
+  onSearch: (value: string) => void;
+}) => {
   const [showFilter, setShowFilter] = useState(true);
   const [dataCat, setDataCat] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]); // Store products
+  const [products, setProducts] = useState<Product[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [checkBoxCat, setCheckBoxCat] = useState<SelecCat>({});
@@ -64,16 +68,9 @@ export const MaxsulotHeader = () => {
   const [categoryProd, setCategoryProd] = useState<number | null>(null);
   const [priceProd, setPriceProd] = useState("");
   const [descProd, setDescProd] = useState("");
-  const [imgProd, setImgProd] = useState("");
-  const [previewImage, setPreviewImage] = useState("");
-  const [fileList, setFileList] = useState<UploadFile[]>([
-    {
-      uid: "-1",
-      name: "image.png",
-      status: "done",
-      url: "https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png",
-    },
-  ]);
+  const [searchVal, setSearchVal] = useState("");
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const showDrawer = () => {
     setOpen(true);
@@ -112,29 +109,6 @@ export const MaxsulotHeader = () => {
     e.stopPropagation();
   };
 
-  const handleVisibleChange = (visible: boolean) => {
-    setDropdownVisible(visible);
-  };
-
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj as FileType);
-    }
-
-    setPreviewImage(file.url || (file.preview as string));
-    setPreviewOpen(true);
-  };
-
-  const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) =>
-    setFileList(newFileList);
-
-  const uploadButton = (
-    <button style={{ border: 0, background: "none" }} type="button">
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </button>
-  );
-
   const addProd = async () => {
     try {
       const NewProduct: Product = {
@@ -143,7 +117,7 @@ export const MaxsulotHeader = () => {
         type: categoryProd || 0,
         price: priceProd,
         desc: descProd,
-        img: fileList[0]?.url || "",
+        img: previewUrl || "",
       };
 
       await axios.post(
@@ -160,12 +134,17 @@ export const MaxsulotHeader = () => {
       setPriceProd("");
       setDescProd("");
       setFileList([]);
+      setPreviewUrl(null);
       setOpen(false);
     } catch (error) {
       message.error("Failed to add product. Please try again.");
       console.error("Error adding product: ", error);
     }
   };
+
+  const search = products.filter((prod) =>
+    prod.name.toLowerCase().includes(searchVal.toLowerCase())
+  );
 
   const items: MenuProps["items"] = [
     {
@@ -204,6 +183,31 @@ export const MaxsulotHeader = () => {
       ),
     },
   ];
+
+  const uploadProps: UploadProps = {
+    beforeUpload: (file) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("You can only upload image files!");
+      }
+      return isImage || Upload.LIST_IGNORE;
+    },
+    onChange: async ({ fileList }) => {
+      setFileList(fileList);
+
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj as FileType;
+        const base64 = await getBase64(file);
+        setPreviewUrl(base64);
+      } else {
+        setPreviewUrl(null);
+      }
+    },
+    maxCount: 1,
+    listType: "picture-card",
+    fileList,
+  };
+
   return (
     <div className="flex">
       <div className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
@@ -235,6 +239,8 @@ export const MaxsulotHeader = () => {
                 background: "transparent",
                 outline: "none",
               }}
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
             />
             <IoSearchOutline style={{ fontSize: "21px", color: "#8D9BA8" }} />
           </div>
@@ -284,7 +290,6 @@ export const MaxsulotHeader = () => {
               style={{ width: 200 }}
               value={categoryProd}
               onChange={(value) => setCategoryProd(value)}
-              dropdownRender={(menu) => <div>{menu}</div>}
             >
               {dataCat.map((item, index) => (
                 <Option key={item.id} value={item.id}>
@@ -312,24 +317,16 @@ export const MaxsulotHeader = () => {
             />
           </div>
           <div>
-            <Upload
-              action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-            >
-              {uploadButton}
-            </Upload>
-            {previewImage && (
+            {fileList.length === 0 && (
+              <Upload {...uploadProps}>
+                <Button icon={<PlusOutlined />}>Upload img</Button>
+              </Upload>
+            )}
+            {previewUrl && (
               <Image
-                wrapperStyle={{ display: "none" }}
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
-                  afterOpenChange: (visible) => !visible && setPreviewImage(""),
-                }}
-                src={previewImage}
+                src={previewUrl}
+                alt="Uploaded Image"
+                style={{ maxWidth: "100%" }}
               />
             )}
           </div>

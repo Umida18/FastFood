@@ -27,11 +27,8 @@ export const KategoriyaHeader = () => {
             <input
               placeholder="Qidirish"
               style={{
-                // width: "300px",
-                // height: "48px",
                 backgroundColor: "#edeff3",
                 border: "none",
-                // borderRadius: "35px",
                 background: "transparent",
                 outline: "none",
               }}
@@ -39,11 +36,6 @@ export const KategoriyaHeader = () => {
             <IoSearchOutline style={{ fontSize: "21px", color: "#8D9BA8" }} />
           </div>
         </div>
-        {/* <div className="w-[48px] h-[48px] bg-[#edeff3] rounded-full flex justify-center content-center items-center">
-        <div className="w-[36px] h-[36px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
-          <CiFilter style={{ fontSize: "21px", color: "#8D9BA8" }} />
-        </div>
-      </div> */}
       </div>
     </div>
   );

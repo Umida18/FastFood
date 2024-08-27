@@ -9,14 +9,9 @@ import {
   Typography,
   message,
 } from "antd";
-<<<<<<< HEAD:src/pages/signIn/signIn.tsx
 import img1 from "../../img/signIn.png";
 import { useNavigate } from "react-router";
 import "./signIn.css";
-=======
-import img1 from "../img/signIn.png";
-import { useNavigate } from "react-router";
->>>>>>> cc6de8b4bb4eb7fa18428171f77f98fa444a2a2a:src/pages/signIn.tsx
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -41,13 +36,7 @@ const SignIn = () => {
       );
       const data = await response.json();
       if (response.ok) {
-<<<<<<< HEAD:src/pages/signIn/signIn.tsx
         message.success("Muvaffaqiyatli tizimga kirildi");
-=======
-        message.success("Successfully signed in");
-
-        navigate("/buyurtmalar");
->>>>>>> cc6de8b4bb4eb7fa18428171f77f98fa444a2a2a:src/pages/signIn.tsx
       } else {
         message.error(data.message || "Tizimga kirish muvaffaqiyatsiz bo'ldi");
       }
