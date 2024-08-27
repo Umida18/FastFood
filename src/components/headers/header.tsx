@@ -1,5 +1,7 @@
 import { KategoriyaHeader } from "./kategoriyaHeader";
 import { MaxsulotHeader } from "./maxsulotHeader";
+// import { FilialHeader } from "./FilialHeader";
+// import { MijozHeader } from "./MijozHeader";
 
 interface HeaderProps {
   onSearch?: (value: string) => void;
@@ -16,4 +18,5 @@ export const headerContent = (
   } else {
     return <div>Default Header Content</div>;
   }
-};
+
+}

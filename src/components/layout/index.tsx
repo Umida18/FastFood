@@ -207,7 +207,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <Menu
           theme="light"
           mode="inline"
-          className="pt-52"
+          className="pt-36"
           items={[
             {
               key: "Chiqish",
@@ -222,20 +222,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
       <AntLayout>
-        {/* <Header
-          className="headerM"
-          style={{
-            padding: 0,
-            background: colorBgContainer,
-            minHeight: "80px",
-          }}
-        >
-          <div>
-            {headerContent(currentHeader, {
-              onSearch: handleSearch,
-            }) || <div> Default Header Content</div>}
-          </div>
-        </Header> */}
+      
+
         <Content>
           <div
             style={{
