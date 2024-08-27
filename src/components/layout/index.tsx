@@ -25,7 +25,7 @@ import {
 } from "antd";
 import { Link, useLocation } from "react-router-dom";
 import Search from "antd/es/input/Search";
-import { headerContent } from "../headers/header";
+// import { headerContent } from "../headers/header";
 
 import { render } from "@testing-library/react";
 import "./style.css";
@@ -188,7 +188,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
       <AntLayout>
-        <Header
+        {/* <Header
           className="headerM"
           style={{
             padding: 0,
@@ -198,8 +198,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         >
           <div>
             {headerContent[currentHeader] || <div>Default Header Content</div>}
-          </div>
-        </Header>
+          </div> 
+        </Header> */}
         <Content>
           <div
             style={{
