@@ -5,7 +5,6 @@ import SignIn from "./pages/signIn/signIn";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import { Maxsulotlar } from "./pages/maxsulotlar/maxsulotlar";
 import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
-
 import Filiallar from "./pages/filiallar/filiallar";
 import Mijozlar from "./pages/mijozlar/mijozlar";
 import { Xisobot } from "./pages/xisobot";
