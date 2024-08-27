@@ -12,12 +12,7 @@ import { IoExitOutline } from "react-icons/io5";
 import "./index.css";
 import { Layout as AntLayout, Menu, theme } from "antd";
 import { Link, useLocation } from "react-router-dom";
-<<<<<<< HEAD
 import Search from "antd/es/input/Search";
-// import { headerContent } from "../headers/header";
-=======
-import { headerContent } from "../headers/header";
->>>>>>> c3088581d59ac3561e2d55b315b4052141085573
 
 import "./style.css";
 import bitmap from "./Bitmap.png";
@@ -227,7 +222,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         />
       </Sider>
       <AntLayout>
-<<<<<<< HEAD
         {/* <Header
           className="headerM"
           style={{
@@ -240,10 +234,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {headerContent[currentHeader] || <div>Default Header Content</div>}
           </div> 
         </Header> */}
-=======
       
 
->>>>>>> c3088581d59ac3561e2d55b315b4052141085573
         <Content>
           <div
             style={{

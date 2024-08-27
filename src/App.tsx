@@ -12,17 +12,12 @@ import { Xisobot } from "./pages/xisobot";
 import { YetkazishNarxi } from "./pages/YetkazishNarxi";
 import { LavozimSozlamalari } from "./pages/lavozimSozlamalari";
 import { Hodimlar } from "./pages/hodimlar";
-<<<<<<< HEAD
-import { Buyurtmalar } from "./pages/buyurtmalar/buyurtmalar";
-import { Xarita } from "./pages/xarita";
-=======
 import { Buyurtmalar } from "./pages/buyurtmalar/buyurmalar";
->>>>>>> c3088581d59ac3561e2d55b315b4052141085573
+import { Xarita } from "./pages/xarita";
 
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
         <Route path="/login" element={<SignIn />}></Route>
         <Route
