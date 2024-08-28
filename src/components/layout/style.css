@@ -25,7 +25,7 @@ li.ant-menu-item-active {
 
 .ant-layout-sider-children:first-child {
   border-left: 8px #fcb600 solid !important;
-  height: 512px;
+  height: 468px;
 }
 li.ant-menu-item {
   margin-left: 0;
