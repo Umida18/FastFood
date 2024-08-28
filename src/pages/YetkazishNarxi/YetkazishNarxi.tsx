@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Checkbox,
   Drawer,
   Dropdown,
   Form,
-  Image,
   Input,
   InputNumber,
   Select,
@@ -20,9 +18,8 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import "./YetkazishNarxi.css";
 import type { GetProp, MenuProps, UploadFile, UploadProps } from "antd";
 import { FaPlus } from "react-icons/fa6";
-import { IoSearchOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
-import { PlusOutlined } from "@ant-design/icons";
+import { Branch } from "../filiallar/filiallar";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -31,14 +28,6 @@ interface Narx {
   filialId: number;
   narxi: number;
   minimalNarx: string;
-}
-interface FilialType {
-  id: number;
-  nameUz: string;
-  nameRu: string;
-  location: string;
-  geometry: [];
-  hours: string;
 }
 
 const { Option } = Select;
@@ -52,7 +41,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 export const YetkazishNarxi = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [products, setProducts] = useState<Narx[]>([]);
-  const [filial, setFilial] = useState<FilialType[]>([]);
+  const [filial, setFilial] = useState<Branch[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
@@ -109,14 +98,9 @@ export const YetkazishNarxi = () => {
     setOpen(false);
   };
 
-  const btnFilter = () => {
-    setShowFilter(!showFilter);
-    setDropdownVisible(!dropdownVisible);
-  };
-
-  const menuClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
+  // const menuClick = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  // };
 
   const deleteProd = async (id: number) => {
     try {
@@ -158,36 +142,18 @@ export const YetkazishNarxi = () => {
         );
         message.success("Yetkazish narxi muvaffaqiyatli yangilandi!");
       }
-
       onClose();
     } catch (error) {
       message.error("Failed to add product. Please try again.");
       console.error("Error adding product: ", error);
     }
   };
-  const uploadProps: UploadProps = {
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith("image/");
-      if (!isImage) {
-        message.error("You can only upload image files!");
-      }
-      return isImage || Upload.LIST_IGNORE;
-    },
-    onChange: async ({ fileList }) => {
-      setFileList(fileList);
 
-      if (fileList.length > 0) {
-        const file = fileList[0].originFileObj as FileType;
-        const base64 = await getBase64(file);
-        setPreviewUrl(base64);
-      } else {
-        setPreviewUrl(null);
-      }
-    },
-    maxCount: 1,
-    listType: "picture-card",
-    fileList,
+  const filialName = (filialId: number) => {
+    const branch = filial.find((branch) => branch.id === filialId);
+    return branch ? branch.nameUz : "Filial topilmadi";
   };
+
   return (
     <div className="bg-[#edeff3]">
       <div
@@ -201,10 +167,10 @@ export const YetkazishNarxi = () => {
         }}
       >
         <div
-          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px] p-3 justify-center gap-3"
+          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px] p-3 items-center justify-center gap-3 "
           onClick={() => showDrawer()}
         >
-          <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center">
+          <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center ">
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
           <Typography
@@ -215,46 +181,10 @@ export const YetkazishNarxi = () => {
               fontWeight: "600",
             }}
           >
-            Yangi maxsulot qo'shish
+            Yangi qo'shish
           </Typography>
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "start",
-            gap: 3,
-          }}
-        >
-          {" "}
-          <div className="w-[300px] h-[48px]  py-3 px-6 items-center">
-            <Input
-              // prefix={<SearchOutlined />}
-              placeholder="Qidirish"
-              // value={searchTerm}
-              // onChange={(e) => setSearchTerm(e.target.value)}
-              className="rounded-[35px] bg-[#edeff3]"
-            />
-          </div>
-          <Space direction="vertical">
-            <Space wrap>
-              <Dropdown
-                // menu={{ items }}
-                placement="bottomRight"
-                arrow
-                trigger={["click"]}
-              >
-                <div
-                  // onClick={btnFilter}
-                  className="w-[40px] h-[40px] bg-[#edeff3] mt-2 rounded-full flex justify-center content-center items-center"
-                >
-                  <div className="w-[36px] h-[36px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
-                    <CiFilter style={{ fontSize: "21px", color: "#8D9BA8" }} />
-                  </div>
-                </div>
-              </Dropdown>
-            </Space>
-          </Space>{" "}
-        </div>
+
         <Drawer
           title={editingProdId ? "Narxlarni Tahrirlash" : "Yangi narx qo'shish"}
           onClose={onClose}
@@ -266,23 +196,25 @@ export const YetkazishNarxi = () => {
           }}
         >
           <Form form={form} layout="vertical" onFinish={addEditProd}>
-            <Form.Item name="filial" label="Filial">
+            <Form.Item name="filialId" label="Filial">
               <Select
                 style={{ width: 200 }}
-                value={filial}
-                onChange={(value) => setFilial(value)}
+                // onChange={
+                //   (value) => setFilial(value)
+                //   // console.log("value", value)
+                // }
               >
                 {filial.map((item, index) => (
-                  <Option key={item.id} value={item.id}>
+                  <Select.Option key={item.id} value={item.id}>
                     {item.nameUz}
-                  </Option>
+                  </Select.Option>
                 ))}
               </Select>
             </Form.Item>
             <Form.Item name="narxi" label="Yetkazish Narxi">
               <InputNumber />
             </Form.Item>
-            <Form.Item name="MinimalNarx" label="Minimal Narx">
+            <Form.Item name="minimalNarx" label="Minimal Narx">
               <Input />
             </Form.Item>
 
@@ -301,14 +233,14 @@ export const YetkazishNarxi = () => {
       {/* salom */}
 
       <div className=" bg-[#edeff3] min-h-[95vh] mt-3">
-        <div className="flex justify-between bg-white my-[20px] h-[45px] py-3 px-10">
+        <div className="flex justify-row gap-60 bg-white my-[20px] h-[45px] py-3 px-10">
           <div className="flex justify-center align-middle uppercase ">
             <Typography
               style={{
                 color: "#2D3A45",
                 fontSize: "14px",
                 fontWeight: "bolder",
-                // paddingLeft: "15px",
+                paddingLeft: "15px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -347,7 +279,6 @@ export const YetkazishNarxi = () => {
               Minimal Narxi
             </Typography>
           </div>
-
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
             <Typography
               style={{
@@ -373,9 +304,10 @@ export const YetkazishNarxi = () => {
                 key={item.id}
                 className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
               >
-                <div className="flex w-[290px]">
+                <div className=" w-[310px] ">
                   <Typography
                     style={{
+                      marginTop: "5px",
                       marginLeft: "20px",
                       fontSize: "15px",
                       color: "#2D3A45",
@@ -383,13 +315,13 @@ export const YetkazishNarxi = () => {
                       alignItems: "center",
                     }}
                   >
-                    {item.filialId}
+                    {filialName(item.filialId)}
                   </Typography>
                 </div>
-                <div className="w-[290px] text-[#2D3A45] text-[15px] flex items-center">
+                <div className="w-[300px] text-[#2D3A45] text-[15px] flex items-center">
                   {item.narxi} UZS
                 </div>
-                <div className="w-[250px] text-[#2D3A45] text-[15px] flex items-center">
+                <div className="w-[360px] text-[#2D3A45] text-[15px] flex items-center">
                   {item.minimalNarx}
                 </div>
 

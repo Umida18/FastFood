@@ -39,24 +39,21 @@ export const Xarita = () => {
       >
         <Map
           defaultState={{ center: [41.327169, 69.282666], zoom: 13 }}
-          className="w-[1050px] h-[550px] m-10 border-solid border-8 border-white mb-10"
+          className="w-[1250px] h-[650px] m-10 border-solid border-8 border-white mb-10"
         >
           <ZoomControl options={{ position: { right: 15, top: 15 } }} />
-          {/* <TypeSelector options={{ float: "left" }} /> */}
-          <div>
-            {" "}
-            {data.map((item: Branch) => {
-              return (
-                <Placemark
-                  geometry={item.geometry}
-                  properties={{
-                    balloonContentHeader: `Operator:${item.operator}`,
-                    balloonContentBody: `Telefon: ${item.telefon}`,
-                  }}
-                />
-              );
-            })}
-          </div>
+          {/* <TypeSelector options={{ float: "left" }} /> */}{" "}
+          {data.map((item: Branch) => {
+            return (
+              <Placemark
+                geometry={item.geometry}
+                properties={{
+                  balloonContentHeader: `Operator:${item.operator}`,
+                  balloonContentBody: `Telefon: ${item.telefon}`,
+                }}
+              />
+            );
+          })}
         </Map>
       </YMaps>
     </div>
