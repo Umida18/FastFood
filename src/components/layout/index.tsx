@@ -136,39 +136,39 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
-  const [searchVal, setSearchVal] = useState("");
+  // const [searchVal, setSearchVal] = useState("");
 
-  const [dataCat, setDataCat] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  // const [dataCat, setDataCat] = useState<Category[]>([]);
+  // const [products, setProducts] = useState<Product[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const responseCat = await axios.get(
-          "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
-        );
-        setDataCat(responseCat.data);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const responseCat = await axios.get(
+  //         "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
+  //       );
+  //       setDataCat(responseCat.data);
 
-        const responseProducts = await axios.get(
-          "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
-        );
-        setProducts(responseProducts.data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
+  //       const responseProducts = await axios.get(
+  //         "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
+  //       );
+  //       setProducts(responseProducts.data);
+  //     } catch (error) {
+  //       console.error("Error fetching data: ", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
-  const location = useLocation();
-  const currentHeader = location.pathname;
+  // const location = useLocation();
+  // const currentHeader = location.pathname;
 
-  const handleSearch = (value: string) => {
-    const filteredProducts = products.filter((prod) =>
-      prod.name.toLowerCase().includes(value.toLowerCase())
-    );
-  };
+  // const handleSearch = (value: string) => {
+  //   const filteredProducts = products.filter((prod) =>
+  //     prod.name.toLowerCase().includes(value.toLowerCase())
+  //   );
+  // };
   return (
     <AntLayout>
       <Sider
@@ -234,7 +234,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {headerContent[currentHeader] || <div>Default Header Content</div>}
           </div> 
         </Header> */}
-      
 
         <Content>
           <div

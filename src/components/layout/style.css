@@ -1,32 +1,28 @@
-li.ant-menu-item-selected {
+li.ant-menu-item-selected,
+.ant-menu-item-active.ant-menu-item-selected {
   background-color: #fcb600 !important;
   color: white !important;
 }
-li.ant-menu-item-active,
-.ant-menu-item-active.ant-menu-item-selected {
+li.ant-menu-item-active {
   background-color: rgb(245, 245, 245) !important;
   color: black !important;
 }
 
-.ant-menu-item-active .ant-menu-item-icon,
-.ant-menu-item-active.ant-menu-item-selected .ant-menu-item-icon {
+.ant-menu-item-active .ant-menu-item-icon {
   background-color: rgb(245, 245, 245) !important;
 }
-.ant-menu-item-active .ant-menu-item-icon svg,
-.ant-menu-item-active.ant-menu-item-selected .ant-menu-item-icon svg {
+.ant-menu-item-active .ant-menu-item-icon svg {
   color: #4b5563 !important;
 }
-.ant-menu-item-selected .ant-menu-item-icon {
+.ant-menu-item-selected .ant-menu-item-icon,
+.ant-menu-item-active.ant-menu-item-selected .ant-menu-item-icon {
   background-color: #fcb600 !important;
 }
-.ant-menu-item-selected .ant-menu-item-icon svg {
+.ant-menu-item-selected .ant-menu-item-icon svg,
+.ant-menu-item-active.ant-menu-item-selected .ant-menu-item-icon svg {
   color: white !important;
 }
-.ant-menu-item-selected.ant-menu-item-active ul {
-  padding-left: 0;
-  margin-left: 0;
-  background-color: red;
-}
+
 .ant-layout-sider-children:first-child {
   border-left: 8px #fcb600 solid !important;
   height: 512px;

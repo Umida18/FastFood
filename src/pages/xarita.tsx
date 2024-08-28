@@ -1,15 +1,24 @@
-import {
-  Map,
-  YMaps,
-  Placemark,
-  ZoomControl,
-  TypeSelector,
-  RouteButton,
-  GeolocationControl,
-} from "@pbe/react-yandex-maps";
-import React from "react";
+import { Map, YMaps, Placemark, ZoomControl } from "@pbe/react-yandex-maps";
+import React, { useEffect, useState } from "react";
+import { Branch } from "./filiallar/filiallar";
+import axios from "axios";
 
 export const Xarita = () => {
+  const [data, setData] = useState<Branch[]>([]);
+  useEffect(() => {
+    const initialData = async () => {
+      try {
+        const response = await axios.get(
+          "https://3c2999041095f9d9.mokky.dev/filial"
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    initialData();
+  }, []);
   return (
     <div className=" bg-[#edeff3] h-[100vh]">
       <div
@@ -24,8 +33,8 @@ export const Xarita = () => {
       ></div>
       <YMaps
         query={{
-          ns: "use-load-option",
-          load: "Map,Placemark,control.ZoomControl,control.FullscreenControl,geoObject.addon.balloon",
+          // ns: "use-load-option",
+          load: "Map,Placemark,control.ZoomControl,geoObject.addon.balloon",
         }}
       >
         <Map
@@ -34,47 +43,20 @@ export const Xarita = () => {
         >
           <ZoomControl options={{ position: { right: 15, top: 15 } }} />
           {/* <TypeSelector options={{ float: "left" }} /> */}
-
-          <Placemark
-            geometry={[41.353122, 69.289043]}
-            properties={{
-              balloonContentHeader: "Operator: Nazarova Munisa",
-              balloonContentBody: "Telefon: +998 90 123 45 67",
-            }}
-          />
-          {/* shaxriston */}
-          <Placemark
-            geometry={[41.318295, 69.294966]}
-            properties={{
-              balloonContentHeader: "Operator: Hamidova Saida",
-              balloonContentBody: "Telefon: +998 90 111 44 66",
-            }}
-          />
-          {/* xamid olimjon */}
-          <Placemark
-            geometry={[41.333155, 69.219448]}
-            properties={{
-              balloonContentHeader: "Operator: Karimova Nigora",
-              balloonContentBody: "Telefon: +998 90 333 55 77",
-            }}
-          />
-          {/* tinchlik */}
-          <Placemark
-            geometry={[41.319601, 69.254077]}
-            properties={{
-              balloonContentHeader: "Operator: Sadriddinov Farrux",
-              balloonContentBody: "Telefon: +998 90 222 11 55",
-            }}
-          />
-          {/* alisher navoiy */}
-          <Placemark
-            geometry={[41.299734, 69.273612]}
-            properties={{
-              balloonContentHeader: "Operator: Suvonov Mansur",
-              balloonContentBody: "Telefon: +998 90 333 44 55",
-            }}
-          />
-          {/* ming orik */}
+          <div>
+            {" "}
+            {data.map((item: Branch) => {
+              return (
+                <Placemark
+                  geometry={item.geometry}
+                  properties={{
+                    balloonContentHeader: `Operator:${item.operator}`,
+                    balloonContentBody: `Telefon: ${item.telefon}`,
+                  }}
+                />
+              );
+            })}
+          </div>
         </Map>
       </YMaps>
     </div>

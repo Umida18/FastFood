@@ -8,7 +8,7 @@ import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
 import Filiallar from "./pages/filiallar/filiallar";
 import Mijozlar from "./pages/mijozlar/mijozlar";
 import { Xisobot } from "./pages/xisobot";
-import { YetkazishNarxi } from "./pages/YetkazishNarxi";
+import { YetkazishNarxi } from "./pages/YetkazishNarxi/YetkazishNarxi";
 import { LavozimSozlamalari } from "./pages/lavozimSozlamalari";
 import { Hodimlar } from "./pages/hodimlar";
 import { Buyurtmalar } from "./pages/buyurtmalar/buyurmalar";

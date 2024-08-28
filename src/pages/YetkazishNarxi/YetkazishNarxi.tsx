@@ -7,6 +7,7 @@ import {
   Form,
   Image,
   Input,
+  InputNumber,
   Select,
   Space,
   Typography,
@@ -16,7 +17,7 @@ import {
 import axios from "axios";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import "./maxsulotlar.css";
+import "./YetkazishNarxi.css";
 import type { GetProp, MenuProps, UploadFile, UploadProps } from "antd";
 import { FaPlus } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
@@ -25,23 +26,21 @@ import { PlusOutlined } from "@ant-design/icons";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-interface Product {
+interface Narx {
   id: number;
-  name: string;
-  type: number;
-  price: string;
-  desc: string;
-  img: string;
+  filialId: number;
+  narxi: number;
+  minimalNarx: string;
 }
-interface Category {
+interface FilialType {
   id: number;
-  MainKateg: number;
   nameUz: string;
   nameRu: string;
+  location: string;
+  geometry: [];
+  hours: string;
 }
-interface SelecCat {
-  [key: string]: string[];
-}
+
 const { Option } = Select;
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -50,13 +49,12 @@ const getBase64 = (file: FileType): Promise<string> =>
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = (error) => reject(error);
   });
-export const Maxsulotlar = () => {
-  const [dataCat, setDataCat] = useState<Category[]>([]);
+export const YetkazishNarxi = () => {
   const [showFilter, setShowFilter] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Narx[]>([]);
+  const [filial, setFilial] = useState<FilialType[]>([]);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [open, setOpen] = useState(false);
-  const [checkBoxCat, setCheckBoxCat] = useState<SelecCat>({});
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [nameProd, setNameProd] = useState("");
@@ -70,15 +68,35 @@ export const Maxsulotlar = () => {
   const [editingProdId, setEditingProdId] = useState<number | null>(null);
   const [form] = Form.useForm();
 
-  const showDrawer = (product?: Product) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseProducts = await axios.get(
+          "https://3c2999041095f9d9.mokky.dev/delivery"
+        );
+        setProducts(responseProducts.data);
+        const responseFilial = await axios.get(
+          " https://3c2999041095f9d9.mokky.dev/filial"
+        );
+        setFilial(responseFilial.data);
+
+        console.log(products, filial);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const showDrawer = (product?: Narx) => {
     if (product) {
       setEditingProdId(product.id);
       form.setFieldsValue({
-        name: product.name,
-        type: product.type,
-        price: product.price,
-        desc: product.desc,
-        img: product.img,
+        id: product.id,
+        filialId: product.filialId,
+        narxi: product.narxi,
+        minimalNarx: product.minimalNarx,
       });
     } else {
       setEditingProdId(null);
@@ -91,26 +109,6 @@ export const Maxsulotlar = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const responseCat = await axios.get(
-          "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
-        );
-        setDataCat(responseCat.data);
-
-        const responseProducts = await axios.get(
-          "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
-        );
-        setProducts(responseProducts.data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const btnFilter = () => {
     setShowFilter(!showFilter);
     setDropdownVisible(!dropdownVisible);
@@ -120,82 +118,53 @@ export const Maxsulotlar = () => {
     e.stopPropagation();
   };
 
-  const items: MenuProps["items"] = [
-    {
-      key: "1",
-      label: (
-        <div className="w-[353px] p-4" onClick={menuClick}>
-          <div>
-            <Typography style={{ color: "#818282" }}>Kategoriya</Typography>
-            <Select
-              value={selectedCategory}
-              style={{ width: 200 }}
-              onChange={(value) => setSelectedCategory(value)}
-            >
-              <Option value={null}>All</Option>
-              {dataCat.map((item) => (
-                <Option key={item.id} value={item.id}>
-                  {item.nameUz}
-                </Option>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <Checkbox.Group
-              style={{ display: "flex", flexDirection: "column" }}
-              onChange={(checkedValues) => {
-                if (checkedValues.length > 0) {
-                  setSortOption(checkedValues[0] as string);
-                } else {
-                  setSortOption(null);
-                }
-              }}
-            >
-              <Checkbox value="priceAsc">
-                Narx bo’yicha (O’sish tartibida)
-              </Checkbox>
-              <Checkbox value="priceDesc">
-                Narx bo’yicha (Kamayish tartibida)
-              </Checkbox>
-              <Checkbox value="nameAsc">Nom bo’yicha (A-Z)</Checkbox>
-              <Checkbox value="nameDesc">Nom bo’yicha (Z-A)</Checkbox>
-            </Checkbox.Group>
-          </div>
-        </div>
-      ),
-    },
-  ];
+  const deleteProd = async (id: number) => {
+    try {
+      await axios.delete(`https://3c2999041095f9d9.mokky.dev/delivery/${id}`);
 
-  const search = products.filter((prod) =>
-    prod.name.toLowerCase().includes(searchVal.toLowerCase())
-  );
+      const updatedProducts = products.filter((p) => p.id !== id);
+      setProducts(updatedProducts);
 
-  const filteredProducts = products
-    .filter((prod) => {
-      return prod.name.toLowerCase().includes(searchVal.toLowerCase());
-    })
-    .filter((prod) => {
-      if (selectedCategory !== null) {
-        return prod.type === selectedCategory;
+      message.success("Muvafaqiyatli o'chirildi");
+    } catch (error) {
+      message.error("O'chirishda xatolik!");
+      console.error("Error deleting product: ", error);
+    }
+  };
+
+  const addEditProd = async (values: {
+    id: 10;
+    filialId: number;
+    narxi: number;
+    minimalNarx: string;
+  }) => {
+    try {
+      if (editingProdId === null) {
+        const response = await axios.post(
+          "https://3c2999041095f9d9.mokky.dev/delivery",
+          values
+        );
+        setProducts([...products, response.data]);
+        message.success("Yetkazish narxi muvaffaqiyatli qo'shildi!");
+      } else {
+        await axios.patch(
+          `https://3c2999041095f9d9.mokky.dev/delivery/${editingProdId}`,
+          values
+        );
+        setProducts(
+          products.map((prod) =>
+            prod.id === editingProdId ? { ...prod, ...values } : prod
+          )
+        );
+        message.success("Yetkazish narxi muvaffaqiyatli yangilandi!");
       }
-      return true;
-    })
-    .sort((a, b) => {
-      switch (sortOption) {
-        case "priceAsc":
-          return parseFloat(a.price) - parseFloat(b.price);
-        case "priceDesc":
-          return parseFloat(b.price) - parseFloat(a.price);
-        case "nameAsc":
-          return a.name.localeCompare(b.name);
-        case "nameDesc":
-          return b.name.localeCompare(a.name);
 
-        default:
-          return 0;
-      }
-    });
-
+      onClose();
+    } catch (error) {
+      message.error("Failed to add product. Please try again.");
+      console.error("Error adding product: ", error);
+    }
+  };
   const uploadProps: UploadProps = {
     beforeUpload: (file) => {
       const isImage = file.type.startsWith("image/");
@@ -219,72 +188,23 @@ export const Maxsulotlar = () => {
     listType: "picture-card",
     fileList,
   };
-
-  const CategName = (id: number) => {
-    const categ = dataCat.find((c) => c.id === id);
-    return categ ? categ.nameUz : "-";
-  };
-
-  const deleteProd = async (id: number) => {
-    try {
-      await axios.delete(
-        `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar/${id}`
-      );
-
-      const updatedProducts = products.filter((p) => p.id !== id);
-      setProducts(updatedProducts);
-
-      message.success("Muvafaqiyatli o'chirildi");
-    } catch (error) {
-      message.error("O'chirishda xatolik!");
-      console.error("Error deleting product: ", error);
-    }
-  };
-
-  const addEditProd = async (values: {
-    name: string;
-    type: number;
-    price: string;
-    desc: string;
-    img: string;
-  }) => {
-    try {
-      if (editingProdId === null) {
-        const response = await axios.post(
-          "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar",
-          values
-        );
-        setProducts([...products, response.data]);
-        message.success("Maxsulot muvaffaqiyatli qo'shildi!");
-      } else {
-        await axios.patch(
-          `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar/${editingProdId}`,
-          values
-        );
-        setProducts(
-          products.map((prod) =>
-            prod.id === editingProdId ? { ...prod, ...values } : prod
-          )
-        );
-        message.success("Maxsulot muvaffaqiyatli yangilandi!");
-      }
-
-      onClose();
-    } catch (error) {
-      message.error("Failed to add product. Please try again.");
-      console.error("Error adding product: ", error);
-    }
-  };
-  console.log(categoryProd);
-
   return (
     <div className="bg-[#edeff3]">
-      <div className="flex bg-white">
-        <div className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
-          <div
-            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center"
-            onClick={() => showDrawer()}
-          >
+      <div
+        className=" bg-white"
+        style={{
+          display: "flex",
+          justifyContent: "start",
+          gap: 3,
+          margin: "0",
+          padding: "0",
+        }}
+      >
+        <div
+          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px] p-3 justify-center gap-3"
+          onClick={() => showDrawer()}
+        >
+          <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center">
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
           <Typography
@@ -292,40 +212,40 @@ export const Maxsulotlar = () => {
               width: "100px",
               color: "#2D3A45",
               lineHeight: "18px",
-              fontWeight: "600px",
+              fontWeight: "600",
             }}
           >
             Yangi maxsulot qo'shish
           </Typography>
         </div>
-        <div className="w-[530px] flex justify-center content-center items-center gap-5">
-          <div className="flex justify-center content-center items-center">
-            <div className="w-[300px] h-[48px] bg-[#edeff3] flex flex-row rounded-[35px] justify-between py-3 px-6 items-center">
-              <input
-                placeholder="Qidirish"
-                style={{
-                  backgroundColor: "#edeff3",
-                  border: "none",
-                  background: "transparent",
-                  outline: "none",
-                }}
-                value={searchVal}
-                onChange={(e) => setSearchVal(e.target.value)}
-              />
-              <IoSearchOutline style={{ fontSize: "21px", color: "#8D9BA8" }} />
-            </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "start",
+            gap: 3,
+          }}
+        >
+          {" "}
+          <div className="w-[300px] h-[48px]  py-3 px-6 items-center">
+            <Input
+              // prefix={<SearchOutlined />}
+              placeholder="Qidirish"
+              // value={searchTerm}
+              // onChange={(e) => setSearchTerm(e.target.value)}
+              className="rounded-[35px] bg-[#edeff3]"
+            />
           </div>
           <Space direction="vertical">
             <Space wrap>
               <Dropdown
-                menu={{ items }}
+                // menu={{ items }}
                 placement="bottomRight"
                 arrow
                 trigger={["click"]}
               >
                 <div
-                  onClick={btnFilter}
-                  className="w-[48px] h-[48px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  // onClick={btnFilter}
+                  className="w-[40px] h-[40px] bg-[#edeff3] mt-2 rounded-full flex justify-center content-center items-center"
                 >
                   <div className="w-[36px] h-[36px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
                     <CiFilter style={{ fontSize: "21px", color: "#8D9BA8" }} />
@@ -333,12 +253,10 @@ export const Maxsulotlar = () => {
                 </div>
               </Dropdown>
             </Space>
-          </Space>
+          </Space>{" "}
         </div>
         <Drawer
-          title={
-            editingProdId ? "Maxsulotni Tahrirlash" : "Yangi maxsulot qo'shish"
-          }
+          title={editingProdId ? "Narxlarni Tahrirlash" : "Yangi narx qo'shish"}
           onClose={onClose}
           open={open}
           style={{
@@ -348,41 +266,24 @@ export const Maxsulotlar = () => {
           }}
         >
           <Form form={form} layout="vertical" onFinish={addEditProd}>
-            <Form.Item name="name" label="Maxsulot nomi">
-              <Input />
-            </Form.Item>
-            <Form.Item name="type" label="Kategoriya">
+            <Form.Item name="filial" label="Filial">
               <Select
                 style={{ width: 200 }}
-                value={categoryProd}
-                onChange={(value) => setCategoryProd(value)}
+                value={filial}
+                onChange={(value) => setFilial(value)}
               >
-                {dataCat.map((item, index) => (
+                {filial.map((item, index) => (
                   <Option key={item.id} value={item.id}>
                     {item.nameUz}
                   </Option>
                 ))}
               </Select>
             </Form.Item>
-            <Form.Item name="price" label="Narxi">
-              <Input />
+            <Form.Item name="narxi" label="Yetkazish Narxi">
+              <InputNumber />
             </Form.Item>
-            <Form.Item name="desc" label="Qo'shimcha ma'lumot">
+            <Form.Item name="MinimalNarx" label="Minimal Narx">
               <Input />
-            </Form.Item>
-            <Form.Item name="img" label="Qo'shimcha ma'lumot">
-              {fileList.length === 0 && (
-                <Upload {...uploadProps}>
-                  <Button icon={<PlusOutlined />}>Upload img</Button>
-                </Upload>
-              )}
-              {previewUrl && (
-                <Image
-                  src={previewUrl}
-                  alt="Uploaded Image"
-                  style={{ maxWidth: "100%" }}
-                />
-              )}
             </Form.Item>
 
             <div>
@@ -396,6 +297,8 @@ export const Maxsulotlar = () => {
           </Form>
         </Drawer>
       </div>
+      {/* salom */}
+      {/* salom */}
 
       <div className=" bg-[#edeff3] min-h-[95vh] mt-3">
         <div className="flex justify-between bg-white my-[20px] h-[45px] py-3 px-10">
@@ -411,22 +314,7 @@ export const Maxsulotlar = () => {
                 alignItems: "center",
               }}
             >
-              Maxsulot
-            </Typography>
-          </div>
-          <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
-            <Typography
-              style={{
-                color: "#2D3A45",
-                fontSize: "14px",
-                fontWeight: "bolder",
-                paddingLeft: "15px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              Kategoriya
+              Filial
             </Typography>
           </div>
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
@@ -456,9 +344,10 @@ export const Maxsulotlar = () => {
                 alignItems: "center",
               }}
             >
-              Qo’shimcha
+              Minimal Narxi
             </Typography>
           </div>
+
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
             <Typography
               style={{
@@ -479,14 +368,12 @@ export const Maxsulotlar = () => {
 
         <div>
           <div className="px-6 flex flex-col gap-3">
-            {filteredProducts.map((item) => (
-              <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
+            {products.map((item) => (
+              <div
+                key={item.id}
+                className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
+              >
                 <div className="flex w-[290px]">
-                  <img
-                    className="h-[40px] w-[40px] rounded-full"
-                    src={item.img}
-                    alt=""
-                  />
                   <Typography
                     style={{
                       marginLeft: "20px",
@@ -496,18 +383,16 @@ export const Maxsulotlar = () => {
                       alignItems: "center",
                     }}
                   >
-                    {item.name}
+                    {item.filialId}
                   </Typography>
                 </div>
                 <div className="w-[290px] text-[#2D3A45] text-[15px] flex items-center">
-                  {CategName(item.type)}
+                  {item.narxi} UZS
                 </div>
                 <div className="w-[250px] text-[#2D3A45] text-[15px] flex items-center">
-                  {item.price}
+                  {item.minimalNarx}
                 </div>
-                <div className="w-[300px] text-[#2D3A45] text-[15px] flex items-center">
-                  {item.desc}
-                </div>
+
                 <div className="flex gap-4">
                   <div
                     onClick={() => showDrawer(item)}

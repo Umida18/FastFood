@@ -10,6 +10,7 @@ import {
   Dropdown,
   MenuProps,
   Select,
+  message,
 } from "antd";
 import {
   PlusOutlined,
@@ -25,12 +26,15 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
 import { IoLocationOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
-interface Branch {
+export interface Branch {
   id: number;
   nameUz: string;
   nameRu: string;
   location: string;
+  operator: string;
+  telefon: string;
   hours: string;
+  geometry: [];
 }
 // const btnFilter = () => {
 //   setShowFilter(!showFilter);
@@ -81,7 +85,7 @@ const BranchTable: React.FC = () => {
     const initialData = async () => {
       try {
         const response = await axios.get(
-          "https://1f5ffb1c4cd92fe3.mokky.dev/fastfood"
+          "https://3c2999041095f9d9.mokky.dev/filial"
         );
         setData(response.data);
       } catch (error) {
@@ -92,8 +96,18 @@ const BranchTable: React.FC = () => {
     initialData();
   }, []);
 
-  const handleDelete = (id: number) => {
-    setData(data.filter((branch) => branch.id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`https://3c2999041095f9d9.mokky.dev/filial/${id}`);
+
+      const updatedFilials = data.filter((p) => p.id !== id);
+      setData(updatedFilials);
+
+      message.success("Muvafaqiyatli o'chirildi");
+    } catch (error) {
+      message.error("O'chirishda xatolik!");
+      console.error("Error deleting product: ", error);
+    }
   };
 
   const handleEdit = (branch: Branch) => {
@@ -124,7 +138,9 @@ const BranchTable: React.FC = () => {
     (branch) =>
       branch.nameUz.toLowerCase().includes(searchTerm.toLowerCase()) ||
       branch.nameRu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.location.toLowerCase().includes(searchTerm.toLowerCase())
+      branch.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      branch.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      branch.telefon.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns = [
@@ -175,7 +191,7 @@ const BranchTable: React.FC = () => {
               fontWeight: "600",
             }}
           >
-            Yangi maxsulot qo'shish
+            Yangi filial qo'shish
           </Typography>
         </div>
         <div
@@ -217,9 +233,8 @@ const BranchTable: React.FC = () => {
         </div>
       </div>
 
-      {/* 
-      salom 
-      salom\ */}
+      {/* salom 
+          salom*/}
       <Table
         columns={columns}
         dataSource={filteredData}
@@ -235,7 +250,14 @@ const BranchTable: React.FC = () => {
       >
         <Form
           initialValues={
-            editingBranch || { nameUz: "", nameRu: "", location: "", hours: "" }
+            editingBranch || {
+              nameUz: "",
+              nameRu: "",
+              location: "",
+              hours: "",
+              operator: "",
+              telefon: "",
+            }
           }
           onFinish={handleDrawerOk}
           layout="vertical"
@@ -276,8 +298,26 @@ const BranchTable: React.FC = () => {
             ]}
           >
             <Input />
+          </Form.Item>{" "}
+          <Form.Item
+            label="OPERATOR"
+            name="operator"
+            rules={[
+              { required: true, message: "Iltimos, operator ismini kiriting!" },
+            ]}
+          >
+            <Input />
+          </Form.Item>{" "}
+          <Form.Item
+            label="TELEFON RAQAM"
+            name="telefon"
+            rules={[
+              { required: true, message: "Iltimos, telefon raqamni kiriting!" },
+            ]}
+          >
+            <Input />
           </Form.Item>
-          <Form.Item>
+          <Form.Item className="mt-3">
             <Button type="primary" htmlType="submit">
               Saqlash
             </Button>
