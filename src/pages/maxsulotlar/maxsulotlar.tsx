@@ -29,7 +29,7 @@ interface Product {
   id: number;
   name: string;
   type: number;
-  price: string;
+  price: number;
   desc: string;
   img: string;
 }
@@ -166,13 +166,11 @@ export const Maxsulotlar = () => {
     },
   ];
 
-  const search = products.filter((prod) =>
-    prod.name.toLowerCase().includes(searchVal.toLowerCase())
-  );
-
   const filteredProducts = products
     .filter((prod) => {
-      return prod.name.toLowerCase().includes(searchVal.toLowerCase());
+      return (
+        prod.name && prod.name.toLowerCase().includes(searchVal.toLowerCase())
+      );
     })
     .filter((prod) => {
       if (selectedCategory !== null) {
@@ -183,9 +181,9 @@ export const Maxsulotlar = () => {
     .sort((a, b) => {
       switch (sortOption) {
         case "priceAsc":
-          return parseFloat(a.price) - parseFloat(b.price);
+          return a.price - b.price;
         case "priceDesc":
-          return parseFloat(b.price) - parseFloat(a.price);
+          return b.price - a.price;
         case "nameAsc":
           return a.name.localeCompare(b.name);
         case "nameDesc":
@@ -249,6 +247,11 @@ export const Maxsulotlar = () => {
     img: string;
   }) => {
     try {
+      const productData = {
+        ...values,
+        price: parseFloat(values.price),
+        img: previewUrl || "",
+      };
       if (editingProdId === null) {
         const response = await axios.post(
           "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar",
@@ -259,11 +262,11 @@ export const Maxsulotlar = () => {
       } else {
         await axios.patch(
           `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar/${editingProdId}`,
-          values
+          productData
         );
         setProducts(
           products.map((prod) =>
-            prod.id === editingProdId ? { ...prod, ...values } : prod
+            prod.id === editingProdId ? { ...prod, ...productData } : prod
           )
         );
         message.success("Maxsulot muvaffaqiyatli yangilandi!");
@@ -274,6 +277,13 @@ export const Maxsulotlar = () => {
       message.error("Failed to add product. Please try again.");
       console.error("Error adding product: ", error);
     }
+  };
+  const PriceComponent = ({ price }: { price: number }) => {
+    const formatPrice = (price: number) => {
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    return <div>{formatPrice(price)} UZS</div>;
   };
   return (
     <div className="bg-[#edeff3]">
@@ -501,7 +511,7 @@ export const Maxsulotlar = () => {
                   {CategName(item.type)}
                 </div>
                 <div className="w-[250px] text-[#2D3A45] text-[15px] flex items-center">
-                  {item.price}
+                  <PriceComponent price={item.price} />
                 </div>
                 <div className="w-[300px] text-[#2D3A45] text-[15px] flex items-center">
                   {item.desc}

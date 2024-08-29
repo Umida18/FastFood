@@ -10,6 +10,9 @@ import { MdOutlineAccessTime } from "react-icons/md";
 import { FiPhone } from "react-icons/fi";
 import { GoColumns } from "react-icons/go";
 import { PiRowsThin } from "react-icons/pi";
+import { TabsProps } from "rc-tabs";
+import { GoPlus } from "react-icons/go";
+import "./buyurtma.css";
 
 interface UserInfo {
   first_name: string;
@@ -33,10 +36,27 @@ interface PaymentM {
   id: number;
   name: string;
 }
+
+interface Category {
+  id: number;
+  MainKateg: number;
+  nameUz: string;
+  nameRu: string;
+}
+interface Product {
+  id: number;
+  name: string;
+  type: number;
+  price: string;
+  desc: string;
+  img: string;
+}
 export const Buyurtmalar: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [buyurtma, setBuyurtma] = useState<Order[]>([]);
   const [tolovTuri, setTolovTuri] = useState<PaymentM[]>([]);
+  const [kategoriya, setKategoriya] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [activeTab, setActiveTab] = useState<string>("yangi");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedView, setSelectedView] = useState<string>("columns");
@@ -57,8 +77,17 @@ export const Buyurtmalar: React.FC = () => {
       const responseT = await axios.get(
         "https://10d4bfbc5e3cc2dc.mokky.dev/paymentMethod"
       );
+      const responseCat = await axios.get(
+        "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
+      );
+
+      const responseProducts = await axios.get(
+        "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
+      );
+      setProducts(responseProducts.data);
       setBuyurtma(reponseB.data);
       setTolovTuri(responseT.data);
+      setKategoriya(responseCat.data);
     };
     fetchData();
   }, []);
@@ -76,11 +105,10 @@ export const Buyurtmalar: React.FC = () => {
 
     return <div>{formatPrice(price)} UZS</div>;
   };
-
   return (
     <div className="">
-      <div className="flex bg-white">
-        <div className="flex border-x-2 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
+      <div className="flex bg-white items-center">
+        <div className="flex border-x-2 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3 items-center">
           <div
             onClick={() => showDrawer()}
             className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center cursor-pointer"
@@ -142,8 +170,75 @@ export const Buyurtmalar: React.FC = () => {
             <PiRowsThin />
           </Button>
         </div>
-        <Drawer title="Basic Drawer" onClose={onClose} open={open}>
-          <p>Some contents...</p>
+        <Drawer
+          title="Basic Drawer"
+          onClose={onClose}
+          open={open}
+          style={{}}
+          width={"1000px"}
+        >
+          <div className="flex gap-4">
+            <div>
+              <Typography>Yangi buturtma qo'shish</Typography>
+              <div className="">
+                <Tabs className="custom-tabs">
+                  {kategoriya.map((category) => (
+                    <TabPane
+                      style={{
+                        // padding: "10px",
+                        // backgroundColor: "#edeff3",
+                        // borderRadius: "30px",
+                        width: "490px",
+                      }}
+                      tab={category.nameUz}
+                      key={category.id}
+                    >
+                      <div className="flex flex-wrap justify-between">
+                        {products
+                          .filter((prod) => prod.type === category.id)
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              className="w-[235px] h-[200px] rounded-[10px] shadow-lg bg-[white] mb-5"
+                            >
+                              <img
+                                className="w-[235px] h-[100px] object-cover rounded-t-[10px]"
+                                src={item.img}
+                                alt=""
+                              />
+                              <div className="p-3 ">
+                                <div>
+                                  <Typography>{item.name}</Typography>
+                                  <Typography>{item.desc}</Typography>
+                                </div>
+                                <div className="flex justify-between">
+                                  <div>
+                                    <PriceComponent price={item.price} />
+                                  </div>
+                                  <Button
+                                    style={{
+                                      backgroundColor: "#20D472",
+                                      color: "white",
+                                      border: "none",
+                                    }}
+                                    icon={<GoPlus />}
+                                  >
+                                    Qo'shish
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </TabPane>
+                  ))}
+                </Tabs>
+              </div>
+            </div>
+            <div>
+              <Typography>Buyurtma ro'yxati</Typography>
+            </div>
+          </div>
         </Drawer>
       </div>
       <div className=" flex justify-center items-center content-center flex-col py-3">
