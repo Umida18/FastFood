@@ -11,25 +11,25 @@ import { FiPhone } from "react-icons/fi";
 import { GoColumns } from "react-icons/go";
 import { PiRowsThin } from "react-icons/pi";
 
-interface UserInfo {
+export interface UserInfo {
   first_name: string;
   last_name: string;
   phone_number: string;
 }
-interface Payment {
+export interface Payment {
   order_amount: string;
   delivery_amount: string;
   total_amount: string;
   payment_method: number;
 }
 
-interface Order {
+export interface Order {
   order_id: number;
   order_time: string;
   user_info: UserInfo;
   order_details: Payment;
 }
-interface PaymentM {
+export interface PaymentM {
   id: number;
   name: string;
 }

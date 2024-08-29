@@ -7,11 +7,11 @@ import { Maxsulotlar } from "./pages/maxsulotlar/maxsulotlar";
 import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
 import Filiallar from "./pages/filiallar/filiallar";
 import Mijozlar from "./pages/mijozlar/mijozlar";
-import { Xisobot } from "./pages/xisobot";
-import { YetkazishNarxi } from "./pages/YetkazishNarxi/YetkazishNarxi";
+import { YetkazishNarxi } from "./pages/YetkazishNarxi";
 import { Hodimlar } from "./pages/hodimlar";
 import { Buyurtmalar } from "./pages/buyurtmalar/buyurmalar";
 import { Xarita } from "./pages/xarita";
+import Xisobot from "./pages/xisobot/xisobot";
 
 function App() {
   return (
@@ -26,6 +26,7 @@ function App() {
             </Layout>
           }
         >
+          <Route index element={<Buyurtmalar />}></Route>
           <Route path="/buyurtmalar" element={<Buyurtmalar />}></Route>
           <Route path="/maxsulotlar" element={<Maxsulotlar />}></Route>
           <Route path="/kategoriyalar" element={<Kategoriyalar />}></Route>
