@@ -1,0 +1,121 @@
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after {
+  width: 490px !important;
+}
+.ant-tabs-nav {
+  width: 490px !important;
+}
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > .ant-tabs-nav::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > div
+  > .ant-tabs-nav::before {
+  border: none;
+}
+.ant-tabs-nav-list {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-right: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.ant-tabs-nav-operations {
+  display: none !important;
+}
+.ant-tabs-tab-active {
+  .ant-tabs-tab-btn {
+    border-bottom: none !important;
+  }
+}
+
+.ant-tabs-tab-btn:focus,
+.ant-tabs-tab-btn:hover {
+  border-bottom: none !important;
+}
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs
+  .ant-tabs-tab.ant-tabs-tab-active
+  .ant-tabs-tab-btn {
+  color: black;
+}
+.ant-tabs-tab .ant-tabs-tab-active {
+  border-bottom: none;
+}
+.custom-tabs .ant-tabs-nav {
+  background-color: #f5f6f8;
+  border-radius: 30px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.custom-tabs .ant-tabs-tab {
+  flex: 1;
+  justify-content: center;
+}
+
+.custom-tabs .ant-tabs-tab-btn {
+  color: #8c8c8c;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+.custom-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #000;
+}
+
+.custom-tabs .ant-tabs-ink-bar {
+  display: none;
+}
+
+.custom-tabs .ant-tabs-tab-active {
+  background-color: white !important;
+  border-radius: 20px !important;
+  color: #000 !important;
+  padding: 5px 20px !important;
+  height: 35px !important;
+}
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-bottom
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-bottom
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::before {
+  box-shadow: none;
+}
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-bottom
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-top
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after,
+:where(.css-dev-only-do-not-override-1c0na6j).ant-tabs-bottom
+  > div
+  > .ant-tabs-nav
+  .ant-tabs-nav-wrap::after {
+  box-shadow: none;
+}
