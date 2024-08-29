@@ -8,8 +8,7 @@ import { Kategoriyalar } from "./pages/kategoriyalar/kategoriyalar";
 import Filiallar from "./pages/filiallar/filiallar";
 import Mijozlar from "./pages/mijozlar/mijozlar";
 import { Xisobot } from "./pages/xisobot";
-import { YetkazishNarxi } from "./pages/YetkazishNarxi";
-import { LavozimSozlamalari } from "./pages/lavozimSozlamalari";
+import { YetkazishNarxi } from "./pages/YetkazishNarxi/YetkazishNarxi";
 import { Hodimlar } from "./pages/hodimlar";
 import { Buyurtmalar } from "./pages/buyurtmalar/buyurmalar";
 import { Xarita } from "./pages/xarita";
@@ -34,10 +33,6 @@ function App() {
           <Route path="/mijozlar" element={<Mijozlar />}></Route>
           <Route path="/xisobot" element={<Xisobot />}></Route>
           <Route path="/hodimlar" element={<Hodimlar />}></Route>
-          <Route
-            path="/lavozimSozlamalari"
-            element={<LavozimSozlamalari />}
-          ></Route>
           <Route path="/yetkazishNarxi" element={<YetkazishNarxi />}></Route>
           <Route path="/xarita" element={<Xarita />}></Route>
         </Route>
