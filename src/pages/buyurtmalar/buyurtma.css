@@ -161,3 +161,12 @@
   > .ant-tabs-nav {
   margin: 0px !important;
 }
+.ant-drawer-body {
+  padding: 34px !important;
+}
+.orderList {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 160px !important;
+  overflow-y: scroll;
+}

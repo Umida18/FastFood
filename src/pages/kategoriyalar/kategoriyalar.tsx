@@ -7,7 +7,11 @@ import "./kategoriyalar.css";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
 
-interface Category {
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { setCategory } from "../../store/slices/kategoriya";
+
+export interface Category {
   id: number;
   MainKateg: number;
   nameUz: string;
@@ -20,6 +24,10 @@ interface MainCategory {
 }
 
 export const Kategoriyalar = () => {
+  const dispatch: AppDispatch = useDispatch();
+  const categories = useSelector(
+    (state: RootState) => state.categories.kategoriya
+  );
   const [dataCat, setDataCat] = useState<Category[]>([]);
   const [dataMainCat, setDataMainCat] = useState<MainCategory[]>([]);
   const [searchVal, setSearchVal] = useState("");
@@ -36,7 +44,7 @@ export const Kategoriyalar = () => {
         const responseMainCat = await axios.get(
           "https://343ba5dbdbceaf9c.mokky.dev/boshKategoriya"
         );
-        setDataCat(responseCat.data);
+        dispatch(setCategory(responseCat.data));
         setDataMainCat(responseMainCat.data);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -71,13 +79,14 @@ export const Kategoriyalar = () => {
     const category = dataMainCat.find((cat) => cat.id === id);
     return category ? category.name : "-";
   };
+  console.log("categories", categories);
 
   const deleteCat = async (id: number) => {
     try {
       await axios.delete(
         `https://2f972b43e3dad83a.mokky.dev/kotegoriyalar/${id}`
       );
-      setDataCat(dataCat.filter((c) => c.id !== id));
+      dispatch(setCategory(categories.filter((c: Category) => c.id !== id)));
       message.success("Kategoriya muvaffaqiyatli o'chirildi!");
     } catch (error) {
       message.error("Xatolik yuz berdi!");
@@ -96,16 +105,18 @@ export const Kategoriyalar = () => {
           "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar",
           values
         );
-        setDataCat([...dataCat, response.data]);
+        dispatch(setCategory([...categories, response.data]));
         message.success("Kategoriya muvaffaqiyatli qo'shildi!");
       } else {
         await axios.patch(
           `https://2f972b43e3dad83a.mokky.dev/kotegoriyalar/${editingCatId}`,
           values
         );
-        setDataCat(
-          dataCat.map((cat) =>
-            cat.id === editingCatId ? { ...cat, ...values } : cat
+        dispatch(
+          setCategory(
+            categories.map((cat: Category) =>
+              cat.id === editingCatId ? { ...cat, ...values } : cat
+            )
           )
         );
         message.success("Kategoriya muvaffaqiyatli yangilandi!");
@@ -117,7 +128,7 @@ export const Kategoriyalar = () => {
     }
   };
 
-  const filterCat = dataCat.filter((categ) =>
+  const filterCat = categories.filter((categ: Category) =>
     categ.nameUz.toLowerCase().includes(searchVal.toLowerCase())
   );
 
@@ -284,7 +295,7 @@ export const Kategoriyalar = () => {
 
       <div>
         <div className="px-6 flex flex-col gap-3 min-h-[85vh]">
-          {filterCat.map((item) => (
+          {filterCat.map((item: Category) => (
             <div
               key={item.id}
               className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"

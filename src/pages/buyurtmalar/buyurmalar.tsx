@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Drawer, Button, Avatar, Tabs, Input } from "antd";
+import {
+  Typography,
+  Drawer,
+  Button,
+  Avatar,
+  Tabs,
+  Input,
+  Select,
+  Form,
+} from "antd";
 import { FaPlus, FaRegUser } from "react-icons/fa6";
 import { IoCheckmark, IoClipboardOutline } from "react-icons/io5";
 import { TbX } from "react-icons/tb";
@@ -15,6 +24,7 @@ import { GoPlus } from "react-icons/go";
 import "./buyurtma.css";
 import { FiTrash2 } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
+import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
 // Interfaces
 interface Payment {
@@ -76,6 +86,10 @@ export const Buyurtmalar: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("yangi");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedView, setSelectedView] = useState<string>("columns");
+  const [openSelMijoz, setOpenSelMijoz] = useState<boolean>(false);
+  const [addProdList, setAddProdList] = useState<Product[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Mijoz | null>(null);
+  const [address, setAddress] = useState<string>("");
 
   const showDrawer = () => {
     setOpen(true);
@@ -129,7 +143,6 @@ export const Buyurtmalar: React.FC = () => {
     return <div>{formatPrice(price)} UZS</div>;
   };
 
-  // Function to get client details
   const getClient = (clientId: number) => {
     const client = mijoz.find((m) => m.id === clientId);
     if (client) {
@@ -189,6 +202,90 @@ export const Buyurtmalar: React.FC = () => {
 
   const filteredOrders = buyurtma.filter((order) => order.status === activeTab);
 
+  const openSelectM = () => {
+    setOpenSelMijoz(true);
+  };
+
+  const addProductToList = (product: Product) => {
+    setAddProdList((prev) => [...prev, product]);
+  };
+
+  const totalPrice = addProdList.reduce((total, prod) => {
+    const piceT = prod.price.toString();
+    return total + parseFloat(piceT.replace(/,/g, ""));
+  }, 0);
+  const delListProd = () => {
+    setAddProdList([]);
+  };
+  const handleClientChange = (clientId: number) => {
+    const client = mijoz.find((m) => m.id === clientId);
+    setSelectedClient(client ? client : null);
+  };
+
+  const handleMapClick = (e: any) => {
+    const coords = e.get("coords");
+    setAddress(`Latitude: ${coords[0]}, Longitude: ${coords[1]}`); // You might need to format this based on your needs
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedClient || addProdList.length === 0 || !address) {
+      console.log("Please fill in all required fields.");
+      return;
+    }
+
+    const orderData = {
+      order_id: 0,
+      // products: addProdList.map((product) => ({
+      //   id: product.id,
+      //   name: product.name,
+      //   price: product.price,
+      // })),
+      totalPrice: totalPrice.toString(),
+      address: address,
+      order_time: new Date().toLocaleTimeString(),
+      order_day: new Date().toLocaleDateString("en-GB"),
+      status: "yangi",
+      order_details: {
+        order_amount: totalPrice.toString(),
+        delivery_amount: "0",
+        total_amount: totalPrice.toString(),
+        payment_method: 1,
+      },
+      filial_id: 1,
+      mijoz_id: selectedClient.id,
+    };
+
+    try {
+      // POST request to create a new order
+      const resp = await axios.post(
+        "https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma",
+        orderData
+      );
+
+      // Extract the new order's ID from the response
+      const newOrderId = resp.data.id;
+
+      // Update the orderData with the new order_id
+      orderData.order_id = newOrderId;
+
+      // PATCH request to update the newly created order with the correct order_id
+      await axios.patch(
+        `https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma/${newOrderId}`,
+        { order_id: newOrderId }
+      );
+
+      // Update the UI with the new order
+      setBuyurtma((prevOrders) => [...prevOrders, resp.data]);
+
+      // Optionally reset the form
+      setAddProdList([]);
+      setSelectedClient(null);
+      setAddress("");
+      setOpen(false);
+    } catch (error) {
+      console.log("Error submitting order:", error);
+    }
+  };
   return (
     <div className="">
       <div className="flex bg-white items-center">
@@ -261,7 +358,7 @@ export const Buyurtmalar: React.FC = () => {
           style={{}}
           width={"1000px"}
         >
-          <div className="flex gap-8">
+          <div className="flex gap-10">
             <div className="flex gap-5 flex-col">
               <div className="mb-4">
                 <Typography
@@ -291,7 +388,7 @@ export const Buyurtmalar: React.FC = () => {
                           .map((item) => (
                             <div
                               key={item.id}
-                              className="w-[235px] h-[200px] rounded-[10px] shadow-lg bg-[white] mb-5"
+                              className="w-[235px] h-[200px] rounded-[10px] shadow-lg bg-[white] mt-5"
                             >
                               <img
                                 className="w-[235px] h-[100px] object-cover rounded-t-[10px]"
@@ -314,6 +411,7 @@ export const Buyurtmalar: React.FC = () => {
                                       border: "none",
                                     }}
                                     icon={<GoPlus />}
+                                    onClick={() => addProductToList(item)}
                                   >
                                     Qo'shish
                                   </Button>
@@ -351,32 +449,84 @@ export const Buyurtmalar: React.FC = () => {
                     backgroundColor: "#edeff3",
                   }}
                   icon={<FiTrash2 />}
+                  onClick={() => delListProd()}
                 />
               </div>
               <div>
                 <div className="w-[330px] h-[263px] rounded-md border-2 border-[#edeff3] p-4">
-                  {/* orders list */}
-                  <div></div>
+                  {/* order list */}
+                  <div className="orderList">
+                    {addProdList.map((item, index) => (
+                      <div key={index} className="flex">
+                        <div>
+                          <p>{item.name}</p>
+                        </div>
+                        <div>
+                          <PriceComponent price={item.price} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                   <div className=" bg-[#edeff3] rounded-md p-3">
                     <Typography style={{ color: "#8d8e90", fontSize: "13px" }}>
                       Umumiy summa
                     </Typography>
                     <Typography style={{ color: "#2D3A45", fontSize: "18px" }}>
-                      0 UZS
+                      <PriceComponent price={totalPrice.toLocaleString()} />
                     </Typography>
                   </div>
                 </div>
-                <div>
-                  <div>
+                <Form onFinish={handleSubmit}>
+                  <Form.Item>
                     <Typography>Mijoz ismi</Typography>
-                    <Input addonAfter={<FiUserPlus />} />
-                  </div>
-                  <div>
+                    <Select
+                      style={{ width: "330px" }}
+                      suffixIcon={<FiUserPlus />}
+                      onChange={handleClientChange}
+                    >
+                      {mijoz.map((item) => (
+                        <Select.Option key={item.id} value={item.id}>
+                          {`${item.firstName} ${item.lastName}`}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item>
                     <Typography>Telefon raqam</Typography>
-                    <Input addonAfter={<FiUserPlus />} />
-                  </div>
-                </div>
+                    <Input
+                      readOnly
+                      value={selectedClient ? selectedClient.phone : ""}
+                    />
+                  </Form.Item>
+                  <Form.Item>
+                    <Typography>Manzil</Typography>
+                    <Input
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                    />
+                    <YMaps
+                      query={{
+                        load: "Map,Placemark,control.ZoomControl,geoObject.addon.balloon,geocode",
+                      }}
+                    >
+                      <Map
+                        defaultState={{
+                          center: [41.327169, 69.282666],
+                          zoom: 13,
+                        }}
+                        onClick={handleMapClick}
+                        modules={["geocode"]}
+                      />
+                    </YMaps>
+                  </Form.Item>
+                  <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                      Saqlash
+                    </Button>
+                  </Form.Item>
+                </Form>
               </div>
+              {/* <Button>Saqlash</Button> */}
             </div>
           </div>
         </Drawer>

@@ -57,20 +57,19 @@ export const Hodimlar = () => {
   }, []);
 
   const onClose = () => {
-    setDrawerOpen(false);
     setEditingCatId(null);
-    form.resetFields();
+    setDrawerOpen(false);
   };
 
   const showDrawer = (hodim?: Hodimlar) => {
     if (hodim) {
       setEditingCatId(hodim.id);
       form.setFieldsValue({
-        fistN: hodim.fistN,
-        lastN: hodim.lastN,
-        thName: hodim.thName,
-        phone: hodim.phone,
-        lavozim: hodim.lavozim,
+        fistN: hodim?.fistN,
+        lastN: hodim?.lastN,
+        thName: hodim?.thName,
+        phone: hodim?.phone,
+        lavozim: hodim?.lavozim,
         filialId: hodim.filialId,
       });
     } else {
@@ -80,10 +79,12 @@ export const Hodimlar = () => {
     setDrawerOpen(true);
   };
   const filialN = (id: number) => {
-    const hod = filial.find((h) => h.id === id);
-    return hod ? hod.nameUz : "-";
+    const filialName = filial.find((f) => f.id === id);
+    return filialName ? filialName.nameUz : "-";
   };
-  const saveCat = async (values: {
+
+  const saveHodim = async (newH: {
+    id: number;
     fistN: string;
     lastN: string;
     thName: string;
@@ -95,40 +96,45 @@ export const Hodimlar = () => {
       if (editingCatId === null) {
         const response = await axios.post(
           "https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar",
-          values
+          newH
         );
         setHodimlar([...hodimlar, response.data]);
         message.success("Hodim muvaffaqiyatli qo'shildi!");
       } else {
-        const response = await axios.patch(
+        await axios.patch(
           `https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar/${editingCatId}`,
-          values
+          newH
         );
         setHodimlar(
-          hodimlar.map((hodim) =>
-            hodim.id === editingCatId ? { ...hodim, ...response.data } : hodim
+          hodimlar.map((h) =>
+            h.id === editingCatId ? { ...hodimlar, ...newH } : h
           )
         );
-        message.success("Hodim muvaffaqiyatli yangilandi!");
       }
       onClose();
     } catch (error) {
-      message.error("Xatolik yuz berdi!");
-      console.error("Error saving data:", error);
+      console.log("Error", error);
     }
   };
 
   const deleteCat = async (id: number) => {
     try {
       await axios.delete(`https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar/${id}`);
-      setHodimlar(hodimlar.filter((hodim) => hodim.id !== id));
-      message.success("Hodim muvaffaqiyatli o'chirildi!");
+
+      const newHodim = hodimlar.filter((h) => h.id !== id);
+      setHodimlar(newHodim);
     } catch (error) {
-      message.error("Xatolik yuz berdi!");
-      console.error("Error deleting data:", error);
+      message.error("O'chirishda Xatolik");
+      console.log("Error deleting hodim:", error);
     }
   };
 
+  const searchHodim = hodimlar.filter(
+    (h) =>
+      h.fistN.toLowerCase().includes(searchVal.toLowerCase()) ||
+      h.lastN.toLowerCase().includes(searchVal.toLowerCase()) ||
+      h.lastN.toLowerCase().includes(searchVal.toLowerCase())
+  );
   return (
     <div className="bg-[#edeff3] min-h-[95vh]">
       <div className="flex bg-white">
@@ -175,7 +181,7 @@ export const Hodimlar = () => {
         onClose={onClose}
         open={drawerOpen}
       >
-        <Form form={form} layout="vertical" onFinish={saveCat}>
+        <Form form={form} layout="vertical" onFinish={saveHodim}>
           <Form.Item
             name="fistN"
             label="Ismi"
@@ -233,7 +239,7 @@ export const Hodimlar = () => {
           </Form.Item>
           <Form.Item
             name="filialId"
-            label="Filial ID"
+            label="Filial"
             rules={[
               {
                 required: true,
@@ -325,7 +331,7 @@ export const Hodimlar = () => {
 
       <div>
         <div className="px-6 flex flex-col gap-3 min-h-[85vh]">
-          {hodimlar.map((item) => (
+          {searchHodim.map((item) => (
             <div
               key={item.id}
               className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
@@ -372,7 +378,7 @@ export const Hodimlar = () => {
               <div className="flex gap-4">
                 <div
                   onClick={() => showDrawer(item)}
-                  className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  className="w-[40px] h-[40px] bg-[#edeff3] cursor-pointer rounded-full flex justify-center content-center items-center"
                 >
                   <div className="w-[32px] h-[32px] bg-white rounded-full flex justify-center content-center items-center">
                     <FiEdit2 style={{ fontSize: "16px" }} />
@@ -380,7 +386,7 @@ export const Hodimlar = () => {
                 </div>
                 <div
                   onClick={() => deleteCat(item.id)}
-                  className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  className="w-[40px] h-[40px] bg-[#edeff3] cursor-pointer rounded-full flex justify-center content-center items-center"
                 >
                   <div className="w-[32px] h-[32px] bg-white rounded-full flex justify-center content-center items-center text-[15px]">
                     <RiDeleteBinLine style={{ fontSize: "16px" }} />
