@@ -26,7 +26,7 @@ interface MainCategory {
 export const Kategoriyalar = () => {
   const dispatch: AppDispatch = useDispatch();
   const categories = useSelector(
-    (state: RootState) => state.categories.kategoriya
+    (state: RootState) => state.
   );
   const [dataCat, setDataCat] = useState<Category[]>([]);
   const [dataMainCat, setDataMainCat] = useState<MainCategory[]>([]);
