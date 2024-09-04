@@ -130,6 +130,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <AntLayout>
       <Sider
+        style={{
+          height: "100vh",
+          backgroundColor: "white",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
         breakpoint="md"
         collapsedWidth="0"
         className="h-full"
@@ -155,35 +161,37 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <p className="text-[8px] ">Online Mahsulotlar sotuvi</p>
           </div>
         </div>
-        <Menu
-          theme="light"
-          mode="inline"
-          defaultSelectedKeys={["buyurtmalar"]}
-          items={items}
-        />
+        <div className="h-[85vh] flex flex-col justify-between ">
+          <Menu
+            theme="light"
+            mode="inline"
+            defaultSelectedKeys={["buyurtmalar"]}
+            items={items}
+          />
 
-        <Menu
-          theme="light"
-          mode="inline"
-          className="pt-64"
-          items={[
-            {
-              key: "Chiqish",
-              icon: <IoExitOutline />,
-              label: (
-                <div>
-                  <Link to="/chiqish">Chiqish</Link>
-                </div>
-              ),
-            },
-          ]}
-        />
+          <Menu
+            theme="light"
+            mode="inline"
+            className=""
+            items={[
+              {
+                key: "Chiqish",
+                icon: <IoExitOutline />,
+                label: (
+                  <div>
+                    <Link to="/login">Chiqish</Link>
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div>
       </Sider>
       <AntLayout>
         <Content>
           <div
             style={{
-              minHeight: "100vh",
+              height: "100vh",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
               backgroundColor: "#edeff3",

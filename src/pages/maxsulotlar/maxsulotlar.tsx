@@ -255,7 +255,7 @@ export const Maxsulotlar = () => {
       if (editingProdId === null) {
         const response = await axios.post(
           "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar",
-          values
+          productData
         );
         setProducts([...products, response.data]);
         message.success("Maxsulot muvaffaqiyatli qo'shildi!");
