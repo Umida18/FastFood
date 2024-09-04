@@ -2,16 +2,27 @@ import { Map, YMaps, Placemark, ZoomControl } from "@pbe/react-yandex-maps";
 import React, { useEffect, useState } from "react";
 import { Branch } from "./filiallar/filiallar";
 import axios from "axios";
-
+import { setXarita } from "../store/slices/xaritaSlice";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { Hodimlar } from "./hodimlar";
 export const Xarita = () => {
-  const [data, setData] = useState<Branch[]>([]);
+  const [hodimlar, setHodimlar] = useState<Hodimlar[]>([]);
+
+  const xarita = useSelector((state: RootState) => state.xarita.xarita);
+  const dispatch = useDispatch();
   useEffect(() => {
     const initialData = async () => {
       try {
         const response = await axios.get(
           "https://3c2999041095f9d9.mokky.dev/filial"
         );
-        setData(response.data);
+        const responseHodimlar = await axios.get(
+          "https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar"
+        );
+
+        setHodimlar(responseHodimlar.data);
+        dispatch(setXarita(response.data));
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -19,6 +30,16 @@ export const Xarita = () => {
 
     initialData();
   }, []);
+
+  const operator = (operatorid: number) => {
+    const branch = hodimlar.find((branch) => operatorid == branch.id);
+    return branch ? branch.fistN + " " + branch.lastN : "topilmadi";
+  };
+  const operatornumber = (operatorid: number) => {
+    const branch = hodimlar.find((branch) => operatorid == branch.id);
+    return branch ? branch.phone : "topilmadi";
+  };
+
   return (
     <div className=" bg-[#edeff3] h-[100vh]">
       <div
@@ -43,13 +64,15 @@ export const Xarita = () => {
         >
           <ZoomControl options={{ position: { right: 15, top: 15 } }} />
           {/* <TypeSelector options={{ float: "left" }} /> */}{" "}
-          {data.map((item: Branch) => {
+          {xarita.map((item: Branch) => {
             return (
               <Placemark
                 geometry={item.geometry}
                 properties={{
-                  balloonContentHeader: `Operator:${item.operator}`,
-                  balloonContentBody: `Telefon: ${item.telefon}`,
+                  balloonContentHeader: `Operator:${operator(item.operatorId)}`,
+                  balloonContentBody: `Telefon: ${operatornumber(
+                    item.operatorId
+                  )}`,
                 }}
               />
             );

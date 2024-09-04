@@ -31,8 +31,7 @@ export interface Branch {
   nameUz: string;
   nameRu: string;
   location: string;
-  operator: string;
-  telefon: string;
+  operatorId: number;
   hours: string;
   geometry: [];
 }
@@ -138,9 +137,7 @@ const BranchTable: React.FC = () => {
     (branch) =>
       branch.nameUz.toLowerCase().includes(searchTerm.toLowerCase()) ||
       branch.nameRu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.operator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.telefon.toLowerCase().includes(searchTerm.toLowerCase())
+      branch.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const columns = [

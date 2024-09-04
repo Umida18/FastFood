@@ -14,11 +14,6 @@ import { TabsProps } from "rc-tabs";
 import { GoPlus } from "react-icons/go";
 import "./buyurtma.css";
 
-export interface UserInfo {
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-}
 export interface Payment {
   order_amount: string;
   delivery_amount: string;
@@ -27,9 +22,12 @@ export interface Payment {
 }
 
 export interface Order {
+  id: number;
   order_id: number;
   order_time: string;
-  user_info: UserInfo;
+  order_day: string;
+  mijoz_id: number;
+  filial_id: number;
   order_details: Payment;
 }
 export interface PaymentM {
@@ -292,10 +290,10 @@ export const Buyurtmalar: React.FC = () => {
                 </div>
                 <div>
                   <Typography style={{ color: "#2D3A45", fontSize: "20px" }}>
-                    {order.user_info.first_name}
+                    {/* {order.user_info.first_name} */}
                   </Typography>
                   <Typography style={{ color: "#2D3A45", fontSize: "20px" }}>
-                    {order.user_info.last_name}
+                    {/* {order.user_info.last_name} */}
                   </Typography>
                 </div>
               </div>
@@ -306,7 +304,7 @@ export const Buyurtmalar: React.FC = () => {
                 </div>
                 <div>
                   <Typography style={{ color: "#2D3A45", fontSize: "14px" }}>
-                    {order.user_info.phone_number}
+                    {/* {order.user_info.phone_number} */}
                   </Typography>
                 </div>
               </div>
