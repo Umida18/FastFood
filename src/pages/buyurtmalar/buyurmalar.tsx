@@ -130,7 +130,10 @@ export const Buyurtmalar: React.FC = () => {
     null
   );
   const [delivery, setDelivery] = useState<Delivey[]>([]);
-  const [delNarx, setDelNarx] = useState<number>();
+  const [delNarx, setDelNarx] = useState<number | undefined>(undefined);
+  const [isProductAdded, setIsProductAdded] = useState<boolean>(false);
+  const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
+  const [selectedTolovTuri, setSelectedTolovTuri] = useState<string>("");
 
   const showDrawer = () => {
     setOpen(true);
@@ -289,33 +292,45 @@ export const Buyurtmalar: React.FC = () => {
         .filter((p) => p.quantity > 0)
     );
   };
-  const [isProductAdded, setIsProductAdded] = useState(false);
 
   // const handleAddProduct = () => {
   //   addProductToList(item);
   //   setIsProductAdded(true);
   // };
-
-  const totalPrice = addProdList.reduce((total, prod) => {
-    const piceT = prod.price.toString();
-    return total + parseFloat(piceT.replace(/,/g, ""));
+  const orderPrice = addProdList.reduce((total, prod) => {
+    const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
+    return total + priceNum;
   }, 0);
+
+  const totalPrice =
+    addProdList.reduce((total, prod) => {
+      const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
+      // const piceT = prod.price.toString();
+      const delivNarx = delNarx ? delNarx : 0;
+      return total + priceNum;
+    }, 0) + (delNarx || 0);
   const delListProd = () => {
     setAddProdList([]);
   };
-
   const handleClientChange = (Id: number) => {
     const client = mijoz.find((m) => m.id === Id);
     setSelectedClient(client ? client : null);
   };
 
   const handleBranchh = (id: number) => {
-    const bran = filial.find((f) => f.id === id);
-    setSelectedFilial(bran ? bran : null);
+    // const bran = filial.find((f) => f.id === id);
+    // setSelectedFilial(bran ? bran : null);
 
-    if (bran) {
-      const operator = hodim.find((h) => h.id === bran.operatorId);
-      setSelectedOperator(operator ? operator : null);
+    // if (bran) {
+    //   const operator = hodim.find((h) => h.id === bran.operatorId);
+    //   setSelectedOperator(operator ? operator : null);
+    // }
+    setSelectedFilialId(id);
+    const branch = filial.find((f) => f.id === id);
+    if (branch) {
+      const operator = hodim.find((h) => h.id === branch.operatorId);
+      const oper = operator ? operator : null;
+      setSelectedOperator(oper);
     }
   };
 
@@ -344,12 +359,12 @@ export const Buyurtmalar: React.FC = () => {
       order_day: new Date().toLocaleDateString("en-GB"),
       status: "yangi",
       order_details: {
-        order_amount: totalPrice.toString(),
-        delivery_amount: "0",
+        order_amount: orderPrice.toString(),
+        delivery_amount: delNarx,
         total_amount: totalPrice.toString(),
-        payment_method: 1,
+        payment_method: selectedTolovTuri,
       },
-      filial_id: selectedFilial?.id,
+      filial_id: selectedFilialId,
       mijoz_id: selectedClient.id,
     };
 
@@ -410,15 +425,24 @@ export const Buyurtmalar: React.FC = () => {
     return "Filial topilmadi";
   };
 
-  const narxDelivery = (id: number): string => {
+  const narxDelivery = (id: number) => {
     const branch = filial.find((f) => f.id === id);
     if (branch) {
       const deliveryI = delivery.find((d) => d.filialId === branch.id);
-      // setDelNarx(deliveryI?.narxi)
-      return deliveryI ? deliveryI.narxi.toString() : "-";
+      return deliveryI ? deliveryI.narxi : 0;
     }
-    return "N/A";
+    return 0;
   };
+
+  useEffect(() => {
+    if (selectedFilialId !== null) {
+      const branch = filial.find((f) => f.id === selectedFilialId);
+      if (branch) {
+        const deliveryP = delivery.find((d) => d.filialId === branch.id);
+        setDelNarx(deliveryP?.narxi || 0);
+      }
+    }
+  }, [selectedFilialId, delivery, filial]);
   return (
     <div className="">
       <div className="flex bg-white items-center">
@@ -631,9 +655,11 @@ export const Buyurtmalar: React.FC = () => {
                     </Typography>
                   </div>
                 </div>
-                <Form onFinish={handleSubmit}>
-                  <Form.Item>
-                    <Typography>Mijoz ismi</Typography>
+                <Form onFinish={handleSubmit} layout="vertical">
+                  <Form.Item style={{ marginTop: 10 }}>
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Mijoz ismi
+                    </Typography>
                     <Select
                       style={{ width: "330px" }}
                       suffixIcon={<FiUserPlus />}
@@ -646,19 +672,27 @@ export const Buyurtmalar: React.FC = () => {
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item>
-                    <Typography>Telefon raqam</Typography>
+                  <Form.Item
+                    // label="Telefon raqam"
+                    // labelCol={{ style: { color: "#8c8c8c" } }}
+                    // labelCol={{ className: "custom-label" }}
+                    style={{ marginTop: 10 }}
+                  >
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Telefon raqam
+                    </Typography>
                     <Input
                       readOnly
                       value={selectedClient ? selectedClient.phone : ""}
                     />
                   </Form.Item>
-                  <Form.Item>
-                    <Typography>Filial</Typography>
+                  <Form.Item style={{ marginTop: 10 }}>
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Filial
+                    </Typography>
                     <Select
                       style={{ width: "330px" }}
-                      // suffixIcon={<FiUserPlus />}
-                      onChange={handleBranchh}
+                      onChange={(value) => handleBranchh(Number(value))}
                     >
                       {filial.map((item) => (
                         <Select.Option key={item.id} value={item.id}>
@@ -667,20 +701,37 @@ export const Buyurtmalar: React.FC = () => {
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item>
-                    <Typography>Operator</Typography>
+                  <Form.Item style={{ marginTop: 10 }}>
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Operator
+                    </Typography>
                     <Input
                       readOnly
                       value={
                         selectedOperator
                           ? `${selectedOperator.fistN} ${selectedOperator.lastN} ${selectedOperator.thName}`
-                          : "Operator tanlanmadi"
+                          : ""
                       }
                     />
                   </Form.Item>
-                  <Form.Item>
-                    <Typography>Manzil</Typography>
+                  <Form.Item style={{ marginTop: 10 }}>
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Tolov turi
+                    </Typography>
+                    <Select onChange={(value) => setSelectedTolovTuri(value)}>
+                      {tolovTuri.map((item, index) => (
+                        <Select.Option key={item.id} value={item.id}>
+                          {item.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item style={{ marginTop: 10 }}>
+                    <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
+                      Manzil
+                    </Typography>
                     <Input
+                      style={{ marginBottom: 10 }}
                       value={
                         address.length
                           ? `L1: ${address[0].L1}, L2: ${address[0].L2}`
@@ -717,14 +768,13 @@ export const Buyurtmalar: React.FC = () => {
                       </Map>
                     </YMaps>
                   </Form.Item>
-                  <Form.Item>
+                  <Form.Item style={{ marginTop: 15 }}>
                     <Button type="primary" htmlType="submit">
                       Saqlash
                     </Button>
                   </Form.Item>
                 </Form>
               </div>
-              {/* <Button>Saqlash</Button> */}
             </div>
           </div>
         </Drawer>
@@ -826,7 +876,9 @@ export const Buyurtmalar: React.FC = () => {
                         <Typography
                           style={{ color: "#2D3A45", fontSize: "14px" }}
                         >
-                          {narxDelivery(order.filial_id)}
+                          {filial && delivery
+                            ? narxDelivery(order.filial_id)
+                            : "N/A"}
                         </Typography>
                       </div>
                     </div>
