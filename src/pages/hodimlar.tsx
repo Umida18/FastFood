@@ -6,7 +6,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
 
-interface Hodimlar {
+export interface Hodimlar {
   id: number;
   fistN: string;
   lastN: string;

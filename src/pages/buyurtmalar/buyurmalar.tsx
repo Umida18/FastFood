@@ -26,16 +26,13 @@ import { FiTrash2 } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
-// Interfaces
-interface Payment {
-  order_amount: string;
+export interface Payment { order_amount: string;
   delivery_amount: string;
   total_amount: string;
   payment_method: number;
 }
 
-interface Order {
-  id: number;
+export interface Order { id: number;
   order_id: number;
   order_time: string;
   order_day: string;
@@ -44,9 +41,7 @@ interface Order {
   order_details: Payment;
   mijoz_id: number;
 }
-
-interface PaymentM {
-  id: number;
+export interface PaymentM { id: number;
   name: string;
 }
 

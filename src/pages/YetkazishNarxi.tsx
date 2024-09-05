@@ -2,81 +2,56 @@ import React, { useState, useEffect } from "react";
 import {
   Button,
   Drawer,
-  Dropdown,
   Form,
   Input,
   InputNumber,
   Select,
-  Space,
   Typography,
-  Upload,
   message,
 } from "antd";
 import axios from "axios";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import "./YetkazishNarxi.css";
-import type { GetProp, MenuProps, UploadFile, UploadProps } from "antd";
 import { FaPlus } from "react-icons/fa6";
-import { CiFilter } from "react-icons/ci";
-import { Branch } from "../filiallar/filiallar";
-
-type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
-
-interface Narx {
+import { Branch } from "./filiallar/filiallar";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
+import { setYetkazishNarxi } from "../store/slices/yetkazishNSlice";
+export interface Narx {
   id: number;
   filialId: number;
   narxi: number;
   minimalNarx: string;
 }
 
-const { Option } = Select;
-const getBase64 = (file: FileType): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
 export const YetkazishNarxi = () => {
-  const [showFilter, setShowFilter] = useState(true);
-  const [products, setProducts] = useState<Narx[]>([]);
   const [filial, setFilial] = useState<Branch[]>([]);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [open, setOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [nameProd, setNameProd] = useState("");
-  const [categoryProd, setCategoryProd] = useState<number | null>(null);
-  const [priceProd, setPriceProd] = useState("");
-  const [descProd, setDescProd] = useState("");
-  const [searchVal, setSearchVal] = useState("");
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [sortOption, setSortOption] = useState<string | null>(null);
   const [editingProdId, setEditingProdId] = useState<number | null>(null);
   const [form] = Form.useForm();
 
+  const yetkazishNarxiData: Narx[] = useSelector(
+    (state: RootState) => state.yetkazishNarxi.yetkazishNarxi
+  );
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
       try {
         const responseProducts = await axios.get(
           "https://3c2999041095f9d9.mokky.dev/delivery"
         );
-        setProducts(responseProducts.data);
+        dispatch(setYetkazishNarxi(responseProducts.data));
         const responseFilial = await axios.get(
           " https://3c2999041095f9d9.mokky.dev/filial"
         );
         setFilial(responseFilial.data);
-
-        console.log(products, filial);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
 
     fetchData();
-  }, []);
+  }, [yetkazishNarxiData]);
 
   const showDrawer = (product?: Narx) => {
     if (product) {
@@ -98,16 +73,12 @@ export const YetkazishNarxi = () => {
     setOpen(false);
   };
 
-  // const menuClick = (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  // };
-
   const deleteProd = async (id: number) => {
     try {
       await axios.delete(`https://3c2999041095f9d9.mokky.dev/delivery/${id}`);
 
-      const updatedProducts = products.filter((p) => p.id !== id);
-      setProducts(updatedProducts);
+      const updatedProducts = yetkazishNarxiData.filter((p) => p.id !== id);
+      dispatch(setYetkazishNarxi(updatedProducts));
 
       message.success("Muvafaqiyatli o'chirildi");
     } catch (error) {
@@ -128,16 +99,18 @@ export const YetkazishNarxi = () => {
           "https://3c2999041095f9d9.mokky.dev/delivery",
           values
         );
-        setProducts([...products, response.data]);
+        dispatch(setYetkazishNarxi([...yetkazishNarxiData, response.data]));
         message.success("Yetkazish narxi muvaffaqiyatli qo'shildi!");
       } else {
         await axios.patch(
           `https://3c2999041095f9d9.mokky.dev/delivery/${editingProdId}`,
           values
         );
-        setProducts(
-          products.map((prod) =>
-            prod.id === editingProdId ? { ...prod, ...values } : prod
+        dispatch(
+          setYetkazishNarxi(
+            yetkazishNarxiData.map((prod) =>
+              prod.id === editingProdId ? { ...prod, ...values } : prod
+            )
           )
         );
         message.success("Yetkazish narxi muvaffaqiyatli yangilandi!");
@@ -299,7 +272,7 @@ export const YetkazishNarxi = () => {
 
         <div>
           <div className="px-6 flex flex-col gap-3">
-            {products.map((item) => (
+            {yetkazishNarxiData.map((item) => (
               <div
                 key={item.id}
                 className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
