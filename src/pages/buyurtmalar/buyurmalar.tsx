@@ -26,13 +26,15 @@ import { FiTrash2 } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
-export interface Payment { order_amount: string;
+export interface Payment {
+  order_amount: string;
   delivery_amount: string;
   total_amount: string;
   payment_method: number;
 }
 
-export interface Order { id: number;
+export interface Order {
+  id: number;
   order_id: number;
   order_time: string;
   order_day: string;
@@ -41,7 +43,8 @@ export interface Order { id: number;
   order_details: Payment;
   mijoz_id: number;
 }
-export interface PaymentM { id: number;
+export interface PaymentM {
+  id: number;
   name: string;
 }
 
@@ -56,9 +59,12 @@ interface Product {
   id: number;
   name: string;
   type: number;
-  price: string;
   desc: string;
   img: string;
+  price: number;
+  quantity: number;
+  originalPrice: number;
+  isProductAdded: boolean;
 }
 
 interface Mijoz {
@@ -105,17 +111,13 @@ export const Buyurtmalar: React.FC = () => {
   const [buyurtma, setBuyurtma] = useState<Order[]>([]);
   const [tolovTuri, setTolovTuri] = useState<PaymentM[]>([]);
   const [kategoriya, setKategoriya] = useState<Category[]>([]);
-  const [products, setProducts] = useState<(Product & { quantity: number })[]>(
-    []
-  );
+  const [products, setProducts] = useState<Product[]>([]);
   const [mijoz, setMijoz] = useState<Mijoz[]>([]);
   const [activeTab, setActiveTab] = useState<string>("yangi");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedView, setSelectedView] = useState<string>("columns");
   const [openSelMijoz, setOpenSelMijoz] = useState<boolean>(false);
-  const [addProdList, setAddProdList] = useState<
-    (Product & { quantity: number })[]
-  >([]);
+  const [addProdList, setAddProdList] = useState<Product[]>([]);
   const [selectedClient, setSelectedClient] = useState<Mijoz | null>(null);
   const [address, setAddress] = useState<Addres[]>([]);
   const [filial, setFilial] = useState<Branch[]>([]);
@@ -129,6 +131,8 @@ export const Buyurtmalar: React.FC = () => {
   const [isProductAdded, setIsProductAdded] = useState<boolean>(false);
   const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
   const [selectedTolovTuri, setSelectedTolovTuri] = useState<string>("");
+  const [quantityProd, setQuantityProd] = useState<number | null>(null);
+  const [totalProductP, setTotalProductP] = useState<number | null>(null);
 
   const showDrawer = () => {
     setOpen(true);
@@ -179,7 +183,7 @@ export const Buyurtmalar: React.FC = () => {
   const handleTabChange = (key: string) => {
     setActiveTab(key);
   };
-
+  // const
   const { Text, Title } = Typography;
 
   const getPaymentMethod = (paymentId: number) => {
@@ -256,51 +260,75 @@ export const Buyurtmalar: React.FC = () => {
   const openSelectM = () => {
     setOpenSelMijoz(true);
   };
-
   const addProductToList = (product: Product) => {
     setAddProdList((prev) => {
       const existingProduct = prev.find((p) => p.id === product.id);
       if (existingProduct) {
-        return prev.map((p) =>
-          p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
+        const updatedList = prev.map((p) =>
+          p.id === product.id
+            ? {
+                ...p,
+                quantity: p.quantity + 1,
+                price: (p.originalPrice || p.price) * (p.quantity + 1),
+                isProductAdded: true,
+              }
+            : p
         );
+        return updatedList;
       } else {
-        return [...prev, { ...product, quantity: 1 }];
+        return [
+          ...prev,
+          {
+            ...product,
+            quantity: 1,
+            originalPrice: product.price,
+            isProductAdded: true,
+          }, // Add the flag here
+        ];
       }
     });
   };
 
-  const incrementQuantity = (productId: number) => {
+  const decrementQuantity = (id: number) => {
     setAddProdList((prev) =>
       prev.map((p) =>
-        p.id === productId ? { ...p, quantity: p.quantity + 1 } : p
+        p.id === id
+          ? {
+              ...p,
+              quantity: p.quantity - 1,
+              price: (p.originalPrice || p.price) * (p.quantity - 1),
+            }
+          : p
       )
     );
   };
 
-  const decrementQuantity = (productId: number) => {
+  const incrementQuantity = (id: number) => {
     setAddProdList((prev) =>
-      prev
-        .map((p) =>
-          p.id === productId ? { ...p, quantity: p.quantity - 1 } : p
-        )
-        .filter((p) => p.quantity > 0)
+      prev.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              quantity: p.quantity + 1,
+              price: (p.originalPrice || p.price) * (p.quantity + 1),
+            }
+          : p
+      )
     );
   };
 
-  // const handleAddProduct = () => {
-  //   addProductToList(item);
-  //   setIsProductAdded(true);
-  // };
-  const orderPrice = addProdList.reduce((total, prod) => {
-    const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
-    return total + priceNum;
-  }, 0);
+  useEffect(() => {
+    const orderPrice = addProdList.reduce((total, prod) => {
+      const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
+      return total + priceNum;
+    }, 0);
+
+    setTotalProductP(orderPrice);
+  }, [addProdList]);
 
   const totalPrice =
     addProdList.reduce((total, prod) => {
       const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
-      // const piceT = prod.price.toString();
       const delivNarx = delNarx ? delNarx : 0;
       return total + priceNum;
     }, 0) + (delNarx || 0);
@@ -313,13 +341,6 @@ export const Buyurtmalar: React.FC = () => {
   };
 
   const handleBranchh = (id: number) => {
-    // const bran = filial.find((f) => f.id === id);
-    // setSelectedFilial(bran ? bran : null);
-
-    // if (bran) {
-    //   const operator = hodim.find((h) => h.id === bran.operatorId);
-    //   setSelectedOperator(operator ? operator : null);
-    // }
     setSelectedFilialId(id);
     const branch = filial.find((f) => f.id === id);
     if (branch) {
@@ -343,24 +364,20 @@ export const Buyurtmalar: React.FC = () => {
 
     const orderData = {
       order_id: 0,
-      // products: addProdList.map((product) => ({
-      //   id: product.id,
-      //   name: product.name,
-      //   price: product.price,
-      // })),
       totalPrice: totalPrice.toString(),
       address: address,
       order_time: new Date().toLocaleTimeString(),
       order_day: new Date().toLocaleDateString("en-GB"),
       status: "yangi",
       order_details: {
-        order_amount: orderPrice.toString(),
+        order_amount: totalProductP,
         delivery_amount: delNarx,
         total_amount: totalPrice.toString(),
         payment_method: selectedTolovTuri,
       },
       filial_id: selectedFilialId,
       mijoz_id: selectedClient.id,
+      quantity: quantityProd,
     };
 
     try {
@@ -394,8 +411,6 @@ export const Buyurtmalar: React.FC = () => {
     return fil ? fil.nameUz : "-";
   };
   const getHodim = (filialId: number) => {
-    // const filiaL = filial.find((f) => f.id === filialId);
-
     if (selectedFilial) {
       const employee = hodim.find((h) => h.id === selectedFilial.operatorId);
       console.log(employee);
@@ -537,27 +552,36 @@ export const Buyurtmalar: React.FC = () => {
                       <div className="flex flex-wrap justify-between">
                         {products
                           .filter((prod) => prod.type === category.id)
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              className="w-[235px] h-[200px] rounded-[10px] shadow-lg bg-[white] mt-5"
-                            >
-                              <img
-                                className="w-[235px] h-[100px] object-cover rounded-t-[10px]"
-                                src={item.img}
-                                alt=""
-                              />
-                              <div className="p-3 ">
-                                <div>
-                                  <Typography>{item.name}</Typography>
-                                  <Typography>{item.desc}</Typography>
-                                </div>
-                                <div className="flex justify-between">
+                          .map((item) => {
+                            // Find if the product is already in the addProdList
+                            const productInList = addProdList.find(
+                              (prod) => prod.id === item.id
+                            );
+
+                            return (
+                              <div
+                                key={item.id}
+                                className="w-[235px] h-[200px] rounded-[10px] shadow-lg bg-[white] mt-5"
+                              >
+                                <img
+                                  className="w-[235px] h-[100px] object-cover rounded-t-[10px]"
+                                  src={item.img}
+                                  alt=""
+                                />
+                                <div className="p-3 ">
                                   <div>
-                                    <PriceComponent price={item.price} />
+                                    <Typography>{item.name}</Typography>
+                                    <Typography>{item.desc}</Typography>
                                   </div>
-                                  <div>
-                                    {isProductAdded ? (
+                                  <div className="flex justify-between">
+                                    <div>
+                                      <PriceComponent
+                                        price={String(item.price)}
+                                      />
+                                    </div>
+
+                                    {/* Render "Qo'shish" button or quantity buttons based on if the product is in the list */}
+                                    {productInList ? (
                                       <div className="flex gap-2">
                                         <Button
                                           onClick={() =>
@@ -566,7 +590,9 @@ export const Buyurtmalar: React.FC = () => {
                                         >
                                           -
                                         </Button>
-                                        <Typography>{item.quantity}</Typography>
+                                        <Typography>
+                                          {productInList.quantity}
+                                        </Typography>
                                         <Button
                                           onClick={() =>
                                             incrementQuantity(item.id)
@@ -591,8 +617,8 @@ export const Buyurtmalar: React.FC = () => {
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                       </div>
                     </TabPane>
                   ))}
@@ -636,7 +662,7 @@ export const Buyurtmalar: React.FC = () => {
                           <p>{item.name}</p>
                         </div>
                         <div>
-                          <PriceComponent price={item.price} />
+                          <PriceComponent price={String(item.price)} />
                         </div>
                       </div>
                     ))}
@@ -667,12 +693,7 @@ export const Buyurtmalar: React.FC = () => {
                       ))}
                     </Select>
                   </Form.Item>
-                  <Form.Item
-                    // label="Telefon raqam"
-                    // labelCol={{ style: { color: "#8c8c8c" } }}
-                    // labelCol={{ className: "custom-label" }}
-                    style={{ marginTop: 10 }}
-                  >
+                  <Form.Item style={{ marginTop: 10 }}>
                     <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
                       Telefon raqam
                     </Typography>
@@ -899,7 +920,7 @@ export const Buyurtmalar: React.FC = () => {
                   {getPaymentMethod(order.order_details.payment_method)}
                 </div>
               </div>
-              <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-10 py-4 gap-6">
+              <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-4 w-[245px] py-4 gap-6">
                 <div>
                   <Typography style={{ color: "#8d8e90", fontSize: "13px" }}>
                     Operator:
@@ -921,36 +942,38 @@ export const Buyurtmalar: React.FC = () => {
                   </Typography>
                 </div>
               </div>
-              <div className="flex flex-col relative left-[107px] gap-3 justify-center ">
-                <div
-                  onClick={() => orderStatus(order, "backward")}
-                  className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                    order.status === "yangi"
-                      ? "cursor-not-allowed opacity-50"
-                      : ""
-                  }`}
-                  style={{
-                    pointerEvents: order.status === "yangi" ? "none" : "auto",
-                  }}
-                >
-                  <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                    <TbX style={{ fontSize: "20px" }} />
+              <div className="flex justify-center items-center">
+                <div className="flex flex-col relative left-[100px] gap-3 justify-center ">
+                  <div
+                    onClick={() => orderStatus(order, "backward")}
+                    className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                      order.status === "yangi"
+                        ? "cursor-not-allowed opacity-50"
+                        : ""
+                    }`}
+                    style={{
+                      pointerEvents: order.status === "yangi" ? "none" : "auto",
+                    }}
+                  >
+                    <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                      <TbX style={{ fontSize: "20px" }} />
+                    </div>
                   </div>
-                </div>
-                <div
-                  onClick={() => orderStatus(order, "forward")}
-                  className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                    order.status === "yopilgan"
-                      ? "cursor-not-allowed opacity-50"
-                      : ""
-                  }`}
-                  style={{
-                    pointerEvents:
-                      order.status === "yopilgan" ? "none" : "auto",
-                  }}
-                >
-                  <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                    <IoCheckmark style={{ fontSize: "20px" }} />
+                  <div
+                    onClick={() => orderStatus(order, "forward")}
+                    className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                      order.status === "yopilgan"
+                        ? "cursor-not-allowed opacity-50"
+                        : ""
+                    }`}
+                    style={{
+                      pointerEvents:
+                        order.status === "yopilgan" ? "none" : "auto",
+                    }}
+                  >
+                    <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                      <IoCheckmark style={{ fontSize: "20px" }} />
+                    </div>
                   </div>
                 </div>
               </div>
