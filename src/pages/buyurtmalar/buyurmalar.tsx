@@ -25,6 +25,7 @@ import "./buyurtma.css";
 import { FiTrash2 } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
+import CardOrdered from "./card";
 
 export interface Payment {
   order_amount: string;
@@ -133,6 +134,7 @@ export const Buyurtmalar: React.FC = () => {
   const [selectedTolovTuri, setSelectedTolovTuri] = useState<string>("");
   const [quantityProd, setQuantityProd] = useState<number | null>(null);
   const [totalProductP, setTotalProductP] = useState<number | null>(null);
+  const [orderNumber, setOrderNumber] = useState<number>();
 
   const showDrawer = () => {
     setOpen(true);
@@ -183,8 +185,6 @@ export const Buyurtmalar: React.FC = () => {
   const handleTabChange = (key: string) => {
     setActiveTab(key);
   };
-  // const
-  const { Text, Title } = Typography;
 
   const getPaymentMethod = (paymentId: number) => {
     const payment = tolovTuri.find((item) => item.id === paymentId);
@@ -198,22 +198,27 @@ export const Buyurtmalar: React.FC = () => {
     return <div>{formatPrice(price)} UZS</div>;
   };
 
-  const getClient = (clientId: number) => {
+  const getClient = (clientId: number): Mijoz => {
     const client = mijoz.find((m) => m.id === clientId);
     if (client) {
       return {
+        id: client.id,
         firstName: client.firstName,
         lastName: client.lastName,
         phone: client.phone,
+        ordersC: client.ordersC,
+        status: client.status,
       };
     }
     return {
+      id: -1,
       firstName: "Unknown",
       lastName: "",
       phone: "",
+      ordersC: 0,
+      status: "Unknown",
     };
   };
-
   const orderStatus = async (
     order: Order,
     direction: "forward" | "backward"
@@ -283,7 +288,7 @@ export const Buyurtmalar: React.FC = () => {
             quantity: 1,
             originalPrice: product.price,
             isProductAdded: true,
-          }, // Add the flag here
+          },
         ];
       }
     });
@@ -363,7 +368,7 @@ export const Buyurtmalar: React.FC = () => {
     }
 
     const orderData = {
-      order_id: 0,
+      order_id: (orderNumber || 0) + 1,
       totalPrice: totalPrice.toString(),
       address: address,
       order_time: new Date().toLocaleTimeString(),
@@ -388,7 +393,8 @@ export const Buyurtmalar: React.FC = () => {
 
       const newOrderId = resp.data.id;
 
-      orderData.order_id = newOrderId;
+      // orderData.order_id = newOrderId;
+      setOrderNumber(newOrderId);
 
       await axios.patch(
         `https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma/${newOrderId}`,
@@ -452,7 +458,18 @@ export const Buyurtmalar: React.FC = () => {
         setDelNarx(deliveryP?.narxi || 0);
       }
     }
+    console.log(orderStatus);
+    console.log(getFilial);
+    console.log(getOperatorForOrder);
+    console.log(getPaymentMethod);
+    console.log(PriceComponent);
+    console.log(getClient);
   }, [selectedFilialId, delivery, filial]);
+
+  useEffect(() => {
+    setOrderNumber(Math.max(...buyurtma.map((p) => p.id)));
+  }, [buyurtma]);
+
   return (
     <div className="">
       <div className="flex bg-white items-center">
@@ -474,7 +491,12 @@ export const Buyurtmalar: React.FC = () => {
             Yangi buyurtma qo'shish
           </Typography>
         </div>
-        <div className="w-[686px] flex justify-center content-center items-center gap-5">
+        <div
+          className={`w-[686px] flex justify-center content-center items-center gap-5 ${
+            selectedView === "columns" ? "cursor-not-allowed opacity-50" : ""
+          }`}
+          // style={{ cursor: selectedView === "row" ? "not-allowed" : "" }}
+        >
           <div className="flex items-center">
             <Tabs
               activeKey={activeTab}
@@ -580,7 +602,6 @@ export const Buyurtmalar: React.FC = () => {
                                       />
                                     </div>
 
-                                    {/* Render "Qo'shish" button or quantity buttons based on if the product is in the list */}
                                     {productInList ? (
                                       <div className="flex gap-2">
                                         <Button
@@ -795,188 +816,340 @@ export const Buyurtmalar: React.FC = () => {
           </div>
         </Drawer>
       </div>
-      <div className=" flex justify-center items-center content-center flex-col py-3">
+      <div>
+        {selectedView === "columns" && (
+          <div className="flex items-center">
+            {/*  <div className="flex justify-center custom-tabss">
+              <div value="yangi" key="yangi">
+                <Typography>Yangi</Typography>
+              </div>
+              <div value="qabulQilingan" key="qabul">
+                <Typography>Qabul qilingan</Typography>
+              </div>
+              <div value="jonatilgan" key="jonatilgan">
+                <Typography>Jo'natilgan</Typography>
+              </div>
+              <div value="yopilgan" key="yopilgan">
+                <Typography>Yopilgan</Typography>
+              </div>
+            </div>*/}
+          </div>
+        )}
+      </div>
+      <div
+        className={`flex justify-center items-center content-center flex-col py-3 ${
+          selectedView === "columns" ? "flex-row" : ""
+        }`}
+      >
         {filteredOrders.map((order) => {
           const client = getClient(order.mijoz_id);
           return (
-            <div
-              key={order.id}
-              className="flex bg-white mt-6 w-[1200px] h-[150px] rounded-md shadow-lg"
-            >
-              <div className="flex flex-col  px-4 py-4 justify-center gap-4 w-[200px] items-center">
-                <div className="flex gap-3">
-                  <div className=" border-b-2 border-[#edeff3]">
-                    <div className=" flex justify-center items-center content-center mb-4">
-                      <Typography
-                        style={{
-                          color: "white",
-                          fontSize: "20px",
-                          backgroundColor: "#20D472",
-                          borderRadius: "30px",
-                          paddingInline: "20px",
-                          paddingBlock: "5px",
-                        }}
-                      >
-                        {order.order_id}
-                      </Typography>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-center content-center">
-                  <div>
-                    <MdOutlineAccessTime
-                      style={{ fontSize: "20px", color: "#8d8e90" }}
-                    />
-                  </div>
-                  <div>
-                    <Typography style={{ color: "#2D3A45", fontSize: "20px" }}>
-                      {order.order_time}
-                    </Typography>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col border-l-2 border-x-[#edeff3] px-4 py-3 justify-center items-center gap-6 w-[300px]">
-                <div className="flex gap-3">
-                  <div>
-                    <FaRegUser
-                      style={{
-                        fontSize: "20px",
-                        color: "#8d8e90",
-                        marginTop: "9px",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <Typography style={{ color: "#2D3A45", fontSize: "20px" }}>
-                      {client.firstName} {client.lastName}
-                    </Typography>
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <div>
-                    <FiPhone style={{ fontSize: "20px", color: "#8d8e90" }} />
-                  </div>
-                  <div>
-                    <Typography style={{ color: "#2D3A45", fontSize: "14px" }}>
-                      {client.phone}
-                    </Typography>
-                  </div>
-                </div>
-              </div>
-              <div className="flex border-l-2 border-x-[#edeff3]  px-4 py-4 justify-center gap-4  w-[330px]">
-                <div className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <div>
-                        <IoClipboardOutline
-                          style={{ fontSize: "20px", color: "#8d8e90" }}
-                        />
+            <div>
+              {selectedView === "rows" && (
+                <div>
+                  <div
+                    key={order.id}
+                    className="flex bg-white mt-6 w-[1200px] h-[150px] rounded-md shadow-lg"
+                  >
+                    <div className="flex flex-col  px-4 py-4 justify-center gap-4 w-[200px] items-center ">
+                      <div className="flex gap-3">
+                        <div className=" border-b-2 border-[#edeff3]">
+                          <div className=" flex justify-center items-center content-center mb-4">
+                            <Typography
+                              style={{
+                                color: "white",
+                                fontSize: "20px",
+                                backgroundColor: "#20D472",
+                                borderRadius: "30px",
+                                paddingInline: "20px",
+                                paddingBlock: "5px",
+                              }}
+                            >
+                              {order.order_id}
+                            </Typography>
+                          </div>
+                        </div>
                       </div>
-                      <div>
-                        <Typography
-                          style={{ color: "#2D3A45", fontSize: "14px" }}
-                        >
-                          <PriceComponent
-                            price={order.order_details.order_amount}
+                      <div className="flex gap-3 items-center content-center">
+                        <div>
+                          <MdOutlineAccessTime
+                            style={{ fontSize: "20px", color: "#8d8e90" }}
                           />
-                        </Typography>
+                        </div>
+                        <div>
+                          <Typography
+                            style={{ color: "#2D3A45", fontSize: "20px" }}
+                          >
+                            {order.order_time}
+                          </Typography>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col border-l-2 border-x-[#edeff3] px-4 py-3 justify-center items-center gap-6 w-[300px] ">
+                      <div className="flex gap-3">
+                        <div>
+                          <FaRegUser
+                            style={{
+                              fontSize: "20px",
+                              color: "#8d8e90",
+                              marginTop: "9px",
+                            }}
+                          />
+                        </div>
+                        <div>
+                          <Typography
+                            style={{ color: "#2D3A45", fontSize: "20px" }}
+                          >
+                            {client.firstName} {client.lastName}
+                          </Typography>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <div>
+                          <FiPhone
+                            style={{ fontSize: "20px", color: "#8d8e90" }}
+                          />
+                        </div>
+                        <div>
+                          <Typography
+                            style={{ color: "#2D3A45", fontSize: "14px" }}
+                          >
+                            {client.phone}
+                          </Typography>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex border-l-2 border-x-[#edeff3]  px-4 py-4 justify-center gap-4  w-[330px] ">
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex gap-2">
+                            <div>
+                              <IoClipboardOutline
+                                style={{ fontSize: "20px", color: "#8d8e90" }}
+                              />
+                            </div>
+                            <div>
+                              <Typography
+                                style={{ color: "#2D3A45", fontSize: "14px" }}
+                              >
+                                <PriceComponent
+                                  price={order.order_details.order_amount}
+                                />
+                              </Typography>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <div>
+                              <CiDeliveryTruck
+                                style={{ fontSize: "20px", color: "#8d8e90" }}
+                              />
+                            </div>
+                            <div>
+                              <Typography
+                                style={{ color: "#2D3A45", fontSize: "14px" }}
+                              >
+                                {filial && delivery
+                                  ? narxDelivery(order.filial_id)
+                                  : "N/A"}
+                              </Typography>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex flex-col">
+                          <Typography
+                            style={{ color: "#8d8e90", fontSize: "13px" }}
+                          >
+                            Umumiy summa
+                          </Typography>
+                          <Typography
+                            style={{
+                              color: "#2D3A45",
+                              fontSize: "20px",
+                              fontWeight: "bolder",
+                            }}
+                          >
+                            <PriceComponent
+                              price={order.order_details.total_amount}
+                            />
+                          </Typography>
+                        </div>
+                      </div>
+                      <div className="flex">
+                        {getPaymentMethod(order.order_details.payment_method)}
+                      </div>
+                    </div>
+                    <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-4 w-[245px] py-4 gap-6 ">
                       <div>
-                        <CiDeliveryTruck
-                          style={{ fontSize: "20px", color: "#8d8e90" }}
-                        />
+                        <Typography
+                          style={{ color: "#8d8e90", fontSize: "13px" }}
+                        >
+                          Operator:
+                        </Typography>
+                        <Typography
+                          style={{ color: "#2D3A45", fontWeight: "bolder" }}
+                        >
+                          {getOperatorForOrder(order.filial_id)}
+                        </Typography>
                       </div>
                       <div>
                         <Typography
-                          style={{ color: "#2D3A45", fontSize: "14px" }}
+                          style={{ color: "#8d8e90", fontSize: "13px" }}
                         >
-                          {filial && delivery
-                            ? narxDelivery(order.filial_id)
-                            : "N/A"}
+                          Filial:
+                        </Typography>
+                        <Typography
+                          style={{ color: "#2D3A45", fontWeight: "bolder" }}
+                        >
+                          {getFilial(order.filial_id)}
                         </Typography>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col">
-                    <Typography style={{ color: "#8d8e90", fontSize: "13px" }}>
-                      Umumiy summa
-                    </Typography>
-                    <Typography
-                      style={{
-                        color: "#2D3A45",
-                        fontSize: "20px",
-                        fontWeight: "bolder",
-                      }}
-                    >
-                      <PriceComponent
-                        price={order.order_details.total_amount}
-                      />
-                    </Typography>
-                  </div>
-                </div>
-                <div className="flex">
-                  {getPaymentMethod(order.order_details.payment_method)}
-                </div>
-              </div>
-              <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-4 w-[245px] py-4 gap-6">
-                <div>
-                  <Typography style={{ color: "#8d8e90", fontSize: "13px" }}>
-                    Operator:
-                  </Typography>
-                  <Typography
-                    style={{ color: "#2D3A45", fontWeight: "bolder" }}
-                  >
-                    {getOperatorForOrder(order.filial_id)}
-                  </Typography>
-                </div>
-                <div>
-                  <Typography style={{ color: "#8d8e90", fontSize: "13px" }}>
-                    Filial:
-                  </Typography>
-                  <Typography
-                    style={{ color: "#2D3A45", fontWeight: "bolder" }}
-                  >
-                    {getFilial(order.filial_id)}
-                  </Typography>
-                </div>
-              </div>
-              <div className="flex justify-center items-center">
-                <div className="flex flex-col relative left-[100px] gap-3 justify-center ">
-                  <div
-                    onClick={() => orderStatus(order, "backward")}
-                    className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                      order.status === "yangi"
-                        ? "cursor-not-allowed opacity-50"
-                        : ""
-                    }`}
-                    style={{
-                      pointerEvents: order.status === "yangi" ? "none" : "auto",
-                    }}
-                  >
-                    <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                      <TbX style={{ fontSize: "20px" }} />
-                    </div>
-                  </div>
-                  <div
-                    onClick={() => orderStatus(order, "forward")}
-                    className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                      order.status === "yopilgan"
-                        ? "cursor-not-allowed opacity-50"
-                        : ""
-                    }`}
-                    style={{
-                      pointerEvents:
-                        order.status === "yopilgan" ? "none" : "auto",
-                    }}
-                  >
-                    <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                      <IoCheckmark style={{ fontSize: "20px" }} />
+                    <div className="flex justify-center items-center">
+                      <div className="flex flex-col relative left-[100px] gap-3 justify-center ">
+                        <div
+                          onClick={() => orderStatus(order, "backward")}
+                          className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                            order.status === "yangi"
+                              ? "cursor-not-allowed opacity-50"
+                              : ""
+                          }`}
+                          style={{
+                            pointerEvents:
+                              order.status === "yangi" ? "none" : "auto",
+                          }}
+                        >
+                          <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                            <TbX style={{ fontSize: "20px" }} />
+                          </div>
+                        </div>
+                        <div
+                          onClick={() => orderStatus(order, "forward")}
+                          className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                            order.status === "yopilgan"
+                              ? "cursor-not-allowed opacity-50"
+                              : ""
+                          }`}
+                          style={{
+                            pointerEvents:
+                              order.status === "yopilgan" ? "none" : "auto",
+                          }}
+                        >
+                          <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                            <IoCheckmark style={{ fontSize: "20px" }} />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
+              {selectedView === "columns" && (
+                <div className="flex gap-4">
+                  <div>
+                    <div>
+                      <Typography>Yangi</Typography>
+                    </div>
+                    {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
+                      buyurtma
+                        .filter((f) => f.status === "yangi")
+                        .map((item) => (
+                          <div key={item.id}>
+                            <CardOrdered
+                              key={item.id}
+                              orderStatus={orderStatus}
+                              getFilial={getFilial}
+                              getOperatorForOrder={getOperatorForOrder}
+                              getPaymentMethod={getPaymentMethod}
+                              filteredOrders={[item]}
+                              getClient={getClient}
+                              PriceComponent={PriceComponent}
+                            />
+                          </div>
+                        ))
+                    ) : (
+                      <Typography>Yangi</Typography>
+                    )}
+                  </div>
+                  <div>
+                    <div>
+                      <Typography>Qabul</Typography>
+                    </div>
+
+                    {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
+                      buyurtma
+                        .filter((f) => f.status === "qabul")
+                        .map((item) => (
+                          <div key={item.id}>
+                            <CardOrdered
+                              key={item.id}
+                              orderStatus={orderStatus}
+                              getFilial={getFilial}
+                              getOperatorForOrder={getOperatorForOrder}
+                              getPaymentMethod={getPaymentMethod}
+                              filteredOrders={[item]}
+                              getClient={getClient}
+                              PriceComponent={PriceComponent}
+                            />
+                          </div>
+                        ))
+                    ) : (
+                      <Typography>Qabul</Typography>
+                    )}
+                  </div>
+                  <div>
+                    <div>
+                      <Typography>Jonatilgan</Typography>
+                    </div>
+                    {buyurtma.filter((b) => b.status === "jonatilgan").length >
+                    0 ? (
+                      buyurtma
+                        .filter((f) => f.status === "jonatilgan")
+                        .map((item) => (
+                          <div key={item.id}>
+                            <CardOrdered
+                              key={item.id}
+                              orderStatus={orderStatus}
+                              getFilial={getFilial}
+                              getOperatorForOrder={getOperatorForOrder}
+                              getPaymentMethod={getPaymentMethod}
+                              filteredOrders={[item]}
+                              getClient={getClient}
+                              PriceComponent={PriceComponent}
+                            />
+                          </div>
+                        ))
+                    ) : (
+                      <Typography>jonatilgan</Typography>
+                    )}
+                  </div>
+                  <div>
+                    <div>
+                      <Typography>Yopilgan</Typography>
+                    </div>
+                    {buyurtma.filter((b) => b.status === "yopilgan").length >
+                    0 ? (
+                      buyurtma
+                        .filter((f) => f.status === "yopilgan")
+                        .map((item) => (
+                          <div key={item.id}>
+                            <CardOrdered
+                              key={item.id}
+                              orderStatus={orderStatus}
+                              getFilial={getFilial}
+                              getOperatorForOrder={getOperatorForOrder}
+                              getPaymentMethod={getPaymentMethod}
+                              filteredOrders={[item]}
+                              getClient={getClient}
+                              PriceComponent={PriceComponent}
+                            />
+                          </div>
+                        ))
+                    ) : (
+                      <Typography>Yopilgan</Typography>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
