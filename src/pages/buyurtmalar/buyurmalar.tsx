@@ -844,7 +844,7 @@ export const Buyurtmalar: React.FC = () => {
         {filteredOrders.map((order) => {
           const client = getClient(order.mijoz_id);
           return (
-            <div>
+            <>
               {selectedView === "rows" && (
                 <div>
                   <div
@@ -1043,116 +1043,115 @@ export const Buyurtmalar: React.FC = () => {
                   </div>
                 </div>
               )}
-              {selectedView === "columns" && (
-                <div className="flex gap-4">
-                  <div>
-                    <div>
-                      <Typography>Yangi</Typography>
-                    </div>
-                    {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
-                      buyurtma
-                        .filter((f) => f.status === "yangi")
-                        .map((item) => (
-                          <div key={item.id}>
-                            <CardOrdered
-                              key={item.id}
-                              orderStatus={orderStatus}
-                              getFilial={getFilial}
-                              getOperatorForOrder={getOperatorForOrder}
-                              getPaymentMethod={getPaymentMethod}
-                              filteredOrders={[item]}
-                              getClient={getClient}
-                              PriceComponent={PriceComponent}
-                            />
-                          </div>
-                        ))
-                    ) : (
-                      <Typography>Yangi</Typography>
-                    )}
-                  </div>
-                  <div>
-                    <div>
-                      <Typography>Qabul</Typography>
-                    </div>
-
-                    {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
-                      buyurtma
-                        .filter((f) => f.status === "qabul")
-                        .map((item) => (
-                          <div key={item.id}>
-                            <CardOrdered
-                              key={item.id}
-                              orderStatus={orderStatus}
-                              getFilial={getFilial}
-                              getOperatorForOrder={getOperatorForOrder}
-                              getPaymentMethod={getPaymentMethod}
-                              filteredOrders={[item]}
-                              getClient={getClient}
-                              PriceComponent={PriceComponent}
-                            />
-                          </div>
-                        ))
-                    ) : (
-                      <Typography>Qabul</Typography>
-                    )}
-                  </div>
-                  <div>
-                    <div>
-                      <Typography>Jonatilgan</Typography>
-                    </div>
-                    {buyurtma.filter((b) => b.status === "jonatilgan").length >
-                    0 ? (
-                      buyurtma
-                        .filter((f) => f.status === "jonatilgan")
-                        .map((item) => (
-                          <div key={item.id}>
-                            <CardOrdered
-                              key={item.id}
-                              orderStatus={orderStatus}
-                              getFilial={getFilial}
-                              getOperatorForOrder={getOperatorForOrder}
-                              getPaymentMethod={getPaymentMethod}
-                              filteredOrders={[item]}
-                              getClient={getClient}
-                              PriceComponent={PriceComponent}
-                            />
-                          </div>
-                        ))
-                    ) : (
-                      <Typography>jonatilgan</Typography>
-                    )}
-                  </div>
-                  <div>
-                    <div>
-                      <Typography>Yopilgan</Typography>
-                    </div>
-                    {buyurtma.filter((b) => b.status === "yopilgan").length >
-                    0 ? (
-                      buyurtma
-                        .filter((f) => f.status === "yopilgan")
-                        .map((item) => (
-                          <div key={item.id}>
-                            <CardOrdered
-                              key={item.id}
-                              orderStatus={orderStatus}
-                              getFilial={getFilial}
-                              getOperatorForOrder={getOperatorForOrder}
-                              getPaymentMethod={getPaymentMethod}
-                              filteredOrders={[item]}
-                              getClient={getClient}
-                              PriceComponent={PriceComponent}
-                            />
-                          </div>
-                        ))
-                    ) : (
-                      <Typography>Yopilgan</Typography>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            </>
           );
         })}
+
+        {selectedView === "columns" && (
+          <div className="flex gap-4">
+            <div>
+              <div>
+                <Typography>Yangi</Typography>
+              </div>
+              {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
+                buyurtma
+                  .filter((f) => f.status === "yangi")
+                  .map((item) => (
+                    <div key={item.id}>
+                      <CardOrdered
+                        key={item.id}
+                        orderStatus={orderStatus}
+                        getFilial={getFilial}
+                        getOperatorForOrder={getOperatorForOrder}
+                        getPaymentMethod={getPaymentMethod}
+                        filteredOrders={[item]}
+                        getClient={getClient}
+                        PriceComponent={PriceComponent}
+                      />
+                    </div>
+                  ))
+              ) : (
+                <Typography>Yangi</Typography>
+              )}
+            </div>
+            <div>
+              <div>
+                <Typography>Qabul</Typography>
+              </div>
+
+              {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
+                buyurtma
+                  .filter((f) => f.status === "qabul")
+                  .map((item) => (
+                    <div key={item.id}>
+                      <CardOrdered
+                        key={item.id}
+                        orderStatus={orderStatus}
+                        getFilial={getFilial}
+                        getOperatorForOrder={getOperatorForOrder}
+                        getPaymentMethod={getPaymentMethod}
+                        filteredOrders={[item]}
+                        getClient={getClient}
+                        PriceComponent={PriceComponent}
+                      />
+                    </div>
+                  ))
+              ) : (
+                <Typography>Qabul</Typography>
+              )}
+            </div>
+            <div>
+              <div>
+                <Typography>Jonatilgan</Typography>
+              </div>
+              {buyurtma.filter((b) => b.status === "jonatilgan").length > 0 ? (
+                buyurtma
+                  .filter((f) => f.status === "jonatilgan")
+                  .map((item) => (
+                    <div key={item.id}>
+                      <CardOrdered
+                        key={item.id}
+                        orderStatus={orderStatus}
+                        getFilial={getFilial}
+                        getOperatorForOrder={getOperatorForOrder}
+                        getPaymentMethod={getPaymentMethod}
+                        filteredOrders={[item]}
+                        getClient={getClient}
+                        PriceComponent={PriceComponent}
+                      />
+                    </div>
+                  ))
+              ) : (
+                <Typography>jonatilgan</Typography>
+              )}
+            </div>
+            <div>
+              <div>
+                <Typography>Yopilgan</Typography>
+              </div>
+              {buyurtma.filter((b) => b.status === "yopilgan").length > 0 ? (
+                buyurtma
+                  .filter((f) => f.status === "yopilgan")
+                  .map((item) => (
+                    <div key={item.id}>
+                      <CardOrdered
+                        key={item.id}
+                        orderStatus={orderStatus}
+                        getFilial={getFilial}
+                        getOperatorForOrder={getOperatorForOrder}
+                        getPaymentMethod={getPaymentMethod}
+                        filteredOrders={[item]}
+                        getClient={getClient}
+                        PriceComponent={PriceComponent}
+                      />
+                    </div>
+                  ))
+              ) : (
+                <Typography>Yopilgan</Typography>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
