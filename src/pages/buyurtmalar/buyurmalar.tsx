@@ -458,18 +458,12 @@ export const Buyurtmalar: React.FC = () => {
         setDelNarx(deliveryP?.narxi || 0);
       }
     }
-    console.log(orderStatus);
-    console.log(getFilial);
-    console.log(getOperatorForOrder);
-    console.log(getPaymentMethod);
-    console.log(PriceComponent);
-    console.log(getClient);
   }, [selectedFilialId, delivery, filial]);
 
   useEffect(() => {
     setOrderNumber(Math.max(...buyurtma.map((p) => p.id)));
   }, [buyurtma]);
-
+  const openOrder = () => {};
   return (
     <div className="">
       <div className="flex bg-white items-center">
@@ -816,28 +810,8 @@ export const Buyurtmalar: React.FC = () => {
           </div>
         </Drawer>
       </div>
-      <div>
-        {selectedView === "columns" && (
-          <div className="flex items-center">
-            {/*  <div className="flex justify-center custom-tabss">
-              <div value="yangi" key="yangi">
-                <Typography>Yangi</Typography>
-              </div>
-              <div value="qabulQilingan" key="qabul">
-                <Typography>Qabul qilingan</Typography>
-              </div>
-              <div value="jonatilgan" key="jonatilgan">
-                <Typography>Jo'natilgan</Typography>
-              </div>
-              <div value="yopilgan" key="yopilgan">
-                <Typography>Yopilgan</Typography>
-              </div>
-            </div>*/}
-          </div>
-        )}
-      </div>
       <div
-        className={`flex justify-center items-center content-center flex-col py-3 ${
+        className={`flex justify-center items-center content-center flex-col h-[630px] py-3 ${
           selectedView === "columns" ? "flex-row" : ""
         }`}
       >
@@ -848,6 +822,7 @@ export const Buyurtmalar: React.FC = () => {
               {selectedView === "rows" && (
                 <div>
                   <div
+                    onClick={openOrder}
                     key={order.id}
                     className="flex bg-white mt-6 w-[1200px] h-[150px] rounded-md shadow-lg"
                   >
@@ -1049,8 +1024,8 @@ export const Buyurtmalar: React.FC = () => {
 
         {selectedView === "columns" && (
           <div className="flex gap-4">
-            <div>
-              <div>
+            <div className="contLast">
+              <div className="titleOrder">
                 <Typography>Yangi</Typography>
               </div>
               {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
@@ -1074,8 +1049,8 @@ export const Buyurtmalar: React.FC = () => {
                 <Typography>Yangi</Typography>
               )}
             </div>
-            <div>
-              <div>
+            <div className="contLast">
+              <div className="titleOrder">
                 <Typography>Qabul</Typography>
               </div>
 
@@ -1100,8 +1075,8 @@ export const Buyurtmalar: React.FC = () => {
                 <Typography>Qabul</Typography>
               )}
             </div>
-            <div>
-              <div>
+            <div className="contLast">
+              <div className="titleOrder">
                 <Typography>Jonatilgan</Typography>
               </div>
               {buyurtma.filter((b) => b.status === "jonatilgan").length > 0 ? (
@@ -1125,8 +1100,8 @@ export const Buyurtmalar: React.FC = () => {
                 <Typography>jonatilgan</Typography>
               )}
             </div>
-            <div>
-              <div>
+            <div className="contLast">
+              <div className="titleOrder">
                 <Typography>Yopilgan</Typography>
               </div>
               {buyurtma.filter((b) => b.status === "yopilgan").length > 0 ? (

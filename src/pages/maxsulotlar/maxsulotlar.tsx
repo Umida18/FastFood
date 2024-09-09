@@ -69,6 +69,8 @@ export const Maxsulotlar = () => {
   const [sortOption, setSortOption] = useState<string | null>(null);
   const [editingProdId, setEditingProdId] = useState<number | null>(null);
   const [form] = Form.useForm();
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const showDrawer = (product?: Product) => {
     if (product) {
@@ -91,25 +93,32 @@ export const Maxsulotlar = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const responseCat = await axios.get(
-          "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
-        );
-        setDataCat(responseCat.data);
+  const fetchData = async (pageNumber: number) => {
+    try {
+      const responseCat = await axios.get(
+        "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
+      );
+      setDataCat(responseCat.data);
 
-        const responseProducts = await axios.get(
-          "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
-        );
-        setProducts(responseProducts.data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
+      const responseProducts = await axios.get(
+        `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar?page=${pageNumber}&limit=5`
+      );
+      if (responseProducts?.data?.items?.length === 0) {
+        setHasMore(false);
+      } else {
+        setProducts((prevProducts) => [
+          ...prevProducts,
+          ...responseProducts?.data?.items,
+        ]);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    fetchData(page);
+  }, [page]);
 
   const btnFilter = () => {
     setShowFilter(!showFilter);
@@ -166,7 +175,7 @@ export const Maxsulotlar = () => {
     },
   ];
 
-  const filteredProducts = products
+  const filteredProducts = (Array.isArray(products) ? products : [])
     .filter((prod) => {
       return (
         prod.name && prod.name.toLowerCase().includes(searchVal.toLowerCase())
@@ -188,12 +197,10 @@ export const Maxsulotlar = () => {
           return a.name.localeCompare(b.name);
         case "nameDesc":
           return b.name.localeCompare(a.name);
-
         default:
           return 0;
       }
     });
-
   const uploadProps: UploadProps = {
     beforeUpload: (file) => {
       const isImage = file.type.startsWith("image/");
@@ -284,6 +291,10 @@ export const Maxsulotlar = () => {
     };
 
     return <div>{formatPrice(price)} UZS</div>;
+  };
+
+  const loadMoreProducts = () => {
+    setPage((prevPage) => prevPage + 1);
   };
   return (
     <div className="bg-[#edeff3]">
@@ -539,16 +550,25 @@ export const Maxsulotlar = () => {
           </div>
         </div>
         <div className="flex justify-center content-center items-center my-3">
-          <Button
-            style={{
-              border: "2px solid #8D9BA8",
-              background: "transparent",
-              width: "1275px",
-              height: "40px",
-            }}
-          >
-            Yana yuklash
-          </Button>
+          {hasMore ? (
+            <div className="flex justify-center content-center items-center my-3">
+              <Button
+                style={{
+                  border: "2px solid #8D9BA8",
+                  background: "transparent",
+                  width: "1275px",
+                  height: "40px",
+                }}
+                onClick={loadMoreProducts}
+              >
+                Yana yuklash
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-center content-center items-center my-3">
+              <p>Barcha mahsulotlar yuklandi</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

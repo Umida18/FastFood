@@ -170,3 +170,15 @@
   height: 160px !important;
   overflow-y: scroll;
 }
+.contLast {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 630px !important;
+  overflow-y: scroll;
+}
+.titleOrder {
+  position: sticky !important;
+  top: 0; /* Stick the title at the top */
+  z-index: 1; /* Ensure it's above other content */
+  background-color: #edeff3;
+}
