@@ -182,3 +182,10 @@
   z-index: 1; /* Ensure it's above other content */
   background-color: #edeff3;
 }
+.cont1 {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 630px !important;
+  overflow-y: scroll;
+  width: 1250px !important;
+}

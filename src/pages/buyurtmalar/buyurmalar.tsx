@@ -811,216 +811,218 @@ export const Buyurtmalar: React.FC = () => {
         </Drawer>
       </div>
       <div
-        className={`flex justify-center items-center content-center flex-col h-[630px] py-3 ${
+        className={`flex justify-center items-center content-center h-[630px] flex-col py-3 ${
           selectedView === "columns" ? "flex-row" : ""
         }`}
       >
-        {filteredOrders.map((order) => {
-          const client = getClient(order.mijoz_id);
-          return (
-            <>
-              {selectedView === "rows" && (
-                <div>
-                  <div
-                    onClick={openOrder}
-                    key={order.id}
-                    className="flex bg-white mt-6 w-[1200px] h-[150px] rounded-md shadow-lg"
-                  >
-                    <div className="flex flex-col  px-4 py-4 justify-center gap-4 w-[200px] items-center ">
-                      <div className="flex gap-3">
-                        <div className=" border-b-2 border-[#edeff3]">
-                          <div className=" flex justify-center items-center content-center mb-4">
+        <div className="cont1">
+          {filteredOrders.map((order) => {
+            const client = getClient(order.mijoz_id);
+            return (
+              <div>
+                {selectedView === "rows" && (
+                  <div>
+                    <div
+                      onClick={openOrder}
+                      key={order.id}
+                      className="flex bg-white mt-6 w-[1200px] h-[150px] rounded-md shadow-lg"
+                    >
+                      <div className="flex flex-col  px-4 py-4 justify-center gap-4 w-[200px] items-center ">
+                        <div className="flex gap-3">
+                          <div className=" border-b-2 border-[#edeff3]">
+                            <div className=" flex justify-center items-center content-center mb-4">
+                              <Typography
+                                style={{
+                                  color: "white",
+                                  fontSize: "20px",
+                                  backgroundColor: "#20D472",
+                                  borderRadius: "30px",
+                                  paddingInline: "20px",
+                                  paddingBlock: "5px",
+                                }}
+                              >
+                                {order.order_id}
+                              </Typography>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-3 items-center content-center">
+                          <div>
+                            <MdOutlineAccessTime
+                              style={{ fontSize: "20px", color: "#8d8e90" }}
+                            />
+                          </div>
+                          <div>
                             <Typography
-                              style={{
-                                color: "white",
-                                fontSize: "20px",
-                                backgroundColor: "#20D472",
-                                borderRadius: "30px",
-                                paddingInline: "20px",
-                                paddingBlock: "5px",
-                              }}
+                              style={{ color: "#2D3A45", fontSize: "20px" }}
                             >
-                              {order.order_id}
+                              {order.order_time}
                             </Typography>
                           </div>
                         </div>
                       </div>
-                      <div className="flex gap-3 items-center content-center">
-                        <div>
-                          <MdOutlineAccessTime
-                            style={{ fontSize: "20px", color: "#8d8e90" }}
-                          />
+                      <div className="flex flex-col border-l-2 border-x-[#edeff3] px-4 py-3 justify-center items-center gap-6 w-[300px] ">
+                        <div className="flex gap-3">
+                          <div>
+                            <FaRegUser
+                              style={{
+                                fontSize: "20px",
+                                color: "#8d8e90",
+                                marginTop: "9px",
+                              }}
+                            />
+                          </div>
+                          <div>
+                            <Typography
+                              style={{ color: "#2D3A45", fontSize: "20px" }}
+                            >
+                              {client.firstName} {client.lastName}
+                            </Typography>
+                          </div>
                         </div>
-                        <div>
-                          <Typography
-                            style={{ color: "#2D3A45", fontSize: "20px" }}
-                          >
-                            {order.order_time}
-                          </Typography>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col border-l-2 border-x-[#edeff3] px-4 py-3 justify-center items-center gap-6 w-[300px] ">
-                      <div className="flex gap-3">
-                        <div>
-                          <FaRegUser
-                            style={{
-                              fontSize: "20px",
-                              color: "#8d8e90",
-                              marginTop: "9px",
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <Typography
-                            style={{ color: "#2D3A45", fontSize: "20px" }}
-                          >
-                            {client.firstName} {client.lastName}
-                          </Typography>
-                        </div>
-                      </div>
-                      <div className="flex gap-3">
-                        <div>
-                          <FiPhone
-                            style={{ fontSize: "20px", color: "#8d8e90" }}
-                          />
-                        </div>
-                        <div>
-                          <Typography
-                            style={{ color: "#2D3A45", fontSize: "14px" }}
-                          >
-                            {client.phone}
-                          </Typography>
+                        <div className="flex gap-3">
+                          <div>
+                            <FiPhone
+                              style={{ fontSize: "20px", color: "#8d8e90" }}
+                            />
+                          </div>
+                          <div>
+                            <Typography
+                              style={{ color: "#2D3A45", fontSize: "14px" }}
+                            >
+                              {client.phone}
+                            </Typography>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex border-l-2 border-x-[#edeff3]  px-4 py-4 justify-center gap-4  w-[330px] ">
-                      <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                          <div className="flex gap-2">
-                            <div>
-                              <IoClipboardOutline
-                                style={{ fontSize: "20px", color: "#8d8e90" }}
-                              />
-                            </div>
-                            <div>
-                              <Typography
-                                style={{ color: "#2D3A45", fontSize: "14px" }}
-                              >
-                                <PriceComponent
-                                  price={order.order_details.order_amount}
+                      <div className="flex border-l-2 border-x-[#edeff3]  px-4 py-4 justify-center gap-4  w-[330px] ">
+                        <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                              <div>
+                                <IoClipboardOutline
+                                  style={{ fontSize: "20px", color: "#8d8e90" }}
                                 />
-                              </Typography>
+                              </div>
+                              <div>
+                                <Typography
+                                  style={{ color: "#2D3A45", fontSize: "14px" }}
+                                >
+                                  <PriceComponent
+                                    price={order.order_details.order_amount}
+                                  />
+                                </Typography>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <div>
+                                <CiDeliveryTruck
+                                  style={{ fontSize: "20px", color: "#8d8e90" }}
+                                />
+                              </div>
+                              <div>
+                                <Typography
+                                  style={{ color: "#2D3A45", fontSize: "14px" }}
+                                >
+                                  {filial && delivery
+                                    ? narxDelivery(order.filial_id)
+                                    : "N/A"}
+                                </Typography>
+                              </div>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <div>
-                              <CiDeliveryTruck
-                                style={{ fontSize: "20px", color: "#8d8e90" }}
+                          <div className="flex flex-col">
+                            <Typography
+                              style={{ color: "#8d8e90", fontSize: "13px" }}
+                            >
+                              Umumiy summa
+                            </Typography>
+                            <Typography
+                              style={{
+                                color: "#2D3A45",
+                                fontSize: "20px",
+                                fontWeight: "bolder",
+                              }}
+                            >
+                              <PriceComponent
+                                price={order.order_details.total_amount}
                               />
-                            </div>
-                            <div>
-                              <Typography
-                                style={{ color: "#2D3A45", fontSize: "14px" }}
-                              >
-                                {filial && delivery
-                                  ? narxDelivery(order.filial_id)
-                                  : "N/A"}
-                              </Typography>
-                            </div>
+                            </Typography>
                           </div>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex">
+                          {getPaymentMethod(order.order_details.payment_method)}
+                        </div>
+                      </div>
+                      <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-4 w-[245px] py-4 gap-6 ">
+                        <div>
                           <Typography
                             style={{ color: "#8d8e90", fontSize: "13px" }}
                           >
-                            Umumiy summa
+                            Operator:
                           </Typography>
                           <Typography
-                            style={{
-                              color: "#2D3A45",
-                              fontSize: "20px",
-                              fontWeight: "bolder",
-                            }}
+                            style={{ color: "#2D3A45", fontWeight: "bolder" }}
                           >
-                            <PriceComponent
-                              price={order.order_details.total_amount}
-                            />
+                            {getOperatorForOrder(order.filial_id)}
+                          </Typography>
+                        </div>
+                        <div>
+                          <Typography
+                            style={{ color: "#8d8e90", fontSize: "13px" }}
+                          >
+                            Filial:
+                          </Typography>
+                          <Typography
+                            style={{ color: "#2D3A45", fontWeight: "bolder" }}
+                          >
+                            {getFilial(order.filial_id)}
                           </Typography>
                         </div>
                       </div>
-                      <div className="flex">
-                        {getPaymentMethod(order.order_details.payment_method)}
-                      </div>
-                    </div>
-                    <div className="border-l-2 border-x-[#edeff3] flex flex-col  px-4 w-[245px] py-4 gap-6 ">
-                      <div>
-                        <Typography
-                          style={{ color: "#8d8e90", fontSize: "13px" }}
-                        >
-                          Operator:
-                        </Typography>
-                        <Typography
-                          style={{ color: "#2D3A45", fontWeight: "bolder" }}
-                        >
-                          {getOperatorForOrder(order.filial_id)}
-                        </Typography>
-                      </div>
-                      <div>
-                        <Typography
-                          style={{ color: "#8d8e90", fontSize: "13px" }}
-                        >
-                          Filial:
-                        </Typography>
-                        <Typography
-                          style={{ color: "#2D3A45", fontWeight: "bolder" }}
-                        >
-                          {getFilial(order.filial_id)}
-                        </Typography>
-                      </div>
-                    </div>
-                    <div className="flex justify-center items-center">
-                      <div className="flex flex-col relative left-[100px] gap-3 justify-center ">
-                        <div
-                          onClick={() => orderStatus(order, "backward")}
-                          className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                            order.status === "yangi"
-                              ? "cursor-not-allowed opacity-50"
-                              : ""
-                          }`}
-                          style={{
-                            pointerEvents:
-                              order.status === "yangi" ? "none" : "auto",
-                          }}
-                        >
-                          <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                            <TbX style={{ fontSize: "20px" }} />
+                      <div className="flex justify-center items-center">
+                        <div className="flex flex-col relative left-[100px] gap-3 justify-center ">
+                          <div
+                            onClick={() => orderStatus(order, "backward")}
+                            className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                              order.status === "yangi"
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
+                            style={{
+                              pointerEvents:
+                                order.status === "yangi" ? "none" : "auto",
+                            }}
+                          >
+                            <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                              <TbX style={{ fontSize: "20px" }} />
+                            </div>
                           </div>
-                        </div>
-                        <div
-                          onClick={() => orderStatus(order, "forward")}
-                          className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
-                            order.status === "yopilgan"
-                              ? "cursor-not-allowed opacity-50"
-                              : ""
-                          }`}
-                          style={{
-                            pointerEvents:
-                              order.status === "yopilgan" ? "none" : "auto",
-                          }}
-                        >
-                          <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
-                            <IoCheckmark style={{ fontSize: "20px" }} />
+                          <div
+                            onClick={() => orderStatus(order, "forward")}
+                            className={`w-[50px] h-[50px] bg-[#edeff3] rounded-full flex justify-center content-center items-center cursor-pointer ${
+                              order.status === "yopilgan"
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
+                            style={{
+                              pointerEvents:
+                                order.status === "yopilgan" ? "none" : "auto",
+                            }}
+                          >
+                            <div className="w-[40px] h-[40px] bg-white rounded-full  flex justify-center content-center items-center">
+                              <IoCheckmark style={{ fontSize: "20px" }} />
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </>
-          );
-        })}
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {selectedView === "columns" && (
           <div className="flex gap-4">
