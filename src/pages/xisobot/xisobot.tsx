@@ -1,7 +1,19 @@
 /** @jsxImportSource @emotion/react */
 
 import React, { useState, useEffect } from "react";
-import { Button, Form, Input, DatePicker, Typography, message } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  DatePicker,
+  Typography,
+  message,
+  Select,
+  Space,
+  Dropdown,
+} from "antd";
+import { Line } from "@ant-design/charts";
+import { IoSearch } from "react-icons/io5";
 import axios from "axios";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiFilter } from "react-icons/ci";
@@ -11,9 +23,9 @@ import { GrUpdate } from "react-icons/gr";
 import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 import { FaChartLine } from "react-icons/fa";
 import { Hodimlar } from "../hodimlar";
-import { LineChart } from "@mui/x-charts/LineChart";
-import type { FormProps } from "antd";
+import type { FormProps, MenuProps } from "antd";
 import styled from "@emotion/styled";
+const { Option } = Select;
 
 interface Narx {
   id: number;
@@ -22,46 +34,26 @@ interface Narx {
   minimalNarx: string;
 }
 
-interface MijozType {
-  id: number;
-  firstName: string;
-  lastName: string;
-  ordersC: number;
-  status: "Active" | "Block";
-  phone: string;
-}
-
-const { RangePicker } = DatePicker;
-
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 },
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 14 },
-  },
-};
 const Xisobot = () => {
   const [products, setProducts] = useState<Narx[]>([]);
   const [filial, setFilial] = useState<Branch[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [buyurtmalar, setBuyurtmalar] = useState<Order[]>([]);
   const [tolovTuri, setTolovTuri] = useState<PaymentM[]>([]);
-  const [mijoz, setMijoz] = useState<MijozType[]>([]);
-  const [searchVal, setSearchVal] = useState("");
   const [selectedView, setSelectedView] = useState<string>("chart");
   const [hodimlar, setHodimlar] = useState<Hodimlar[]>([]);
-  // const [componentVariant, setComponentVariant] =
-  //   useState<FormProps["variant"]>("filled");
-
-  // const onFormVariantChange = ({
-  //   variant,
-  // }: {
-  //   variant: FormProps["variant"];
-  // }) => {
-  //   setComponentVariant(variant);
-  // };
+  const [filterDate, setFilterDate] = useState<string>("");
+  const [showFilter, setShowFilter] = useState(true);
+  const [showFilterr, setShowFilterr] = useState(true);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [dropdownVisiblee, setDropdownVisiblee] = useState(false);
+  const [selectedFilial, setSelectedFilial] = useState<number | null>(null);
+  const [yopilganselectedFilial, setYopilganselectedFilial] = useState<
+    number | null
+  >(null);
+  const [form] = Form.useForm();
+  const [componentVariant, setComponentVariant] =
+    useState<FormProps["variant"]>("borderless");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,9 +70,7 @@ const Xisobot = () => {
         const responsePaymentMethod = await axios.get(
           "https://10d4bfbc5e3cc2dc.mokky.dev/paymentMethod"
         );
-        const responseMijoz = await axios.get(
-          "https://10d4bfbc5e3cc2dc.mokky.dev/mijoz"
-        );
+
         const responseHodimlar = await axios.get(
           "https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar"
         );
@@ -90,9 +80,8 @@ const Xisobot = () => {
         setFilial(responseFilial.data);
         setBuyurtmalar(responseBuyurtmalar.data);
         setTolovTuri(responsePaymentMethod.data);
-        setMijoz(responseMijoz.data);
 
-        console.log(products, filial, buyurtmalar, tolovTuri, responseMijoz);
+        console.log(products, filial, buyurtmalar, tolovTuri);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -101,6 +90,12 @@ const Xisobot = () => {
     fetchData();
   }, []);
 
+  const filteredFilial = filial.filter((prod) => {
+    return (
+      prod.nameUz &&
+      prod.nameUz.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
   const deleteProd = async (id: number) => {
     try {
       await axios.delete(`https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma/${id}`);
@@ -114,7 +109,50 @@ const Xisobot = () => {
       console.error("Xisobot O'chirishda error: ", error);
     }
   };
+  const btnFilter = () => {
+    setShowFilter(!showFilter);
+    setDropdownVisible(!dropdownVisible);
+  };
+  const yopilganbtnFilter = () => {
+    setShowFilterr(!showFilterr);
+    setDropdownVisiblee(!dropdownVisiblee);
+  };
 
+  const onFinish = (values: { date: any }) => {
+    let { date } = values;
+
+    const tanlanganDate = date ? date.toDate() : null;
+    const yil = tanlanganDate ? tanlanganDate.getFullYear() : null;
+    const oy = tanlanganDate ? tanlanganDate.getMonth() + 1 : null;
+    const kun = tanlanganDate ? tanlanganDate.getDate() : null;
+    date = `${kun < 10 ? "0" + kun : kun}/${oy < 10 ? "0" + oy : oy}/${yil}`;
+    date =
+      date == "0null/0null/null"
+        ? ""
+        : `${kun < 10 ? "0" + kun : kun}/${oy < 10 ? "0" + oy : oy}/${yil}`;
+    setFilterDate(date);
+    console.log("value", values);
+    console.log("date", date);
+    console.log("tanlangan date", tanlanganDate);
+    // message.success("new card is add");
+  };
+  const yopilganonFinish = (values: { date: any }) => {
+    // let { date } = values;
+    // const tanlanganDate = date ? date.toDate() : null;
+    // const yil = tanlanganDate ? tanlanganDate.getFullYear() : null;
+    // const oy = tanlanganDate ? tanlanganDate.getMonth() + 1 : null;
+    // const kun = tanlanganDate ? tanlanganDate.getDate() : null;
+    // date = `${kun < 10 ? "0" + kun : kun}/${oy < 10 ? "0" + oy : oy}/${yil}`;
+    // date =
+    //   date == "0null/0null/null"
+    //     ? ""
+    //     : `${kun < 10 ? "0" + kun : kun}/${oy < 10 ? "0" + oy : oy}/${yil}`;
+    // setFilterDate(date);
+    // console.log("value", values);
+    // console.log("date", date);
+    // console.log("tanlangan date", tanlanganDate);
+    // message.success("new card is add");
+  };
   const operatorName = (operatorid: number) => {
     const branch = hodimlar.find((branch) => branch.id == operatorid);
     return branch ? branch.fistN + " " + branch.lastN : "Aniqlanmadi";
@@ -129,6 +167,80 @@ const Xisobot = () => {
     const branch = buyurtmalar.find((branch) => branch.filial_id == filialid);
     return branch ? branch.order_time : "Aniqlanmadi";
   };
+
+  function refreshPage(): void {
+    window.location.reload();
+  }
+
+  const menuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+  const menuClickk = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const items: MenuProps["items"] = [
+    {
+      key: "1",
+      label: (
+        <div className="w-[353px] p-4" onClick={menuClick}>
+          <Typography style={{ color: "#818282" }}>Filiallar</Typography>
+          <Select
+            value={selectedFilial}
+            style={{ width: 150 }}
+            onChange={(value) => setSelectedFilial(value)}
+          >
+            <Option value={null}>Hamma filiallar</Option>
+            {filial.map((item) => (
+              <Option key={item.id} value={item.id}>
+                {item.nameUz}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      ),
+    },
+  ];
+
+  const items2: MenuProps["items"] = [
+    {
+      key: "2",
+      label: (
+        <div className="w-[353px] p-4" onClick={menuClickk}>
+          <Typography style={{ color: "#818282" }}>Filiallar</Typography>
+          <Select
+            value={yopilganselectedFilial}
+            style={{ width: 150 }}
+            onChange={(value) => setYopilganselectedFilial(value)}
+          >
+            <Option value={null}>Barcha filiallar</Option>
+            {filial.map((item) => (
+              <Option key={item.id} value={item.id}>
+                {item.nameUz}
+              </Option>
+            ))}
+          </Select>
+        </div>
+      ),
+    },
+  ];
+
+  const filteredBuyurtmalar = buyurtmalar
+    .filter((prod) => {
+      if (filterDate !== "") {
+        return prod.order_day === filterDate;
+      }
+      return true;
+    })
+    .filter((prod) => {
+      if (selectedFilial !== null) {
+        return prod.filial_id === selectedFilial;
+      }
+      return true;
+    });
+
+  console.log("filter buyurtma", filteredBuyurtmalar);
+
   const totalSumTerminal = (filialid: number) => {
     const terminal = buyurtmalar.filter(
       (branch) =>
@@ -185,7 +297,7 @@ const Xisobot = () => {
     return naxt ? n : 0;
   };
   const Terminal = () => {
-    const terminal = buyurtmalar.filter(
+    const terminal = filteredBuyurtmalar.filter(
       (branch) => branch.order_details.payment_method == 1
     );
     const terminaltotal = terminal.map((item) => {
@@ -202,7 +314,7 @@ const Xisobot = () => {
     return terminal ? n : 0;
   };
   const Payme = () => {
-    const payme = buyurtmalar.filter(
+    const payme = filteredBuyurtmalar.filter(
       (branch) => branch.order_details.payment_method == 2
     );
     const paymetotal = payme.map((item) => {
@@ -219,7 +331,7 @@ const Xisobot = () => {
     return payme ? n : 0;
   };
   const Naxt = () => {
-    const naxt = buyurtmalar.filter(
+    const naxt = filteredBuyurtmalar.filter(
       (branch) => branch.order_details.payment_method == 3
     );
     const naxttotal = naxt.map((item) => {
@@ -237,9 +349,119 @@ const Xisobot = () => {
   };
   const total = Naxt() + Terminal() + Payme();
 
-  function refreshPage(): void {
-    window.location.reload();
-  }
+  const selectfilialnomi = (filialid: number | null) => {
+    const namefilial = filial.find((branch) => branch.id == filialid);
+    return namefilial ? namefilial.nameUz : "Barcha filiallar";
+  };
+  const yopilganselectedFilialnomi = (filialid: number | null) => {
+    const namefilial = filial.find((branch) => branch.id == filialid);
+    return namefilial ? namefilial.nameUz : "Barcha filiallar";
+  };
+
+  const { RangePicker } = DatePicker;
+
+  console.log("form", form.getFieldValue(DatePicker));
+
+  const a = buyurtmalar
+    .filter(
+      (order, index, self) =>
+        index === self.findIndex((o) => o.order_day === order.order_day)
+    )
+    .map((item) => item.order_day);
+
+  const formatDate = (dateString: string) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const [day, month, year] = dateString.split("/");
+    return `${day} ${months[parseInt(month, 10) - 1]}`;
+  };
+  const labelformattedDates = a.map(formatDate);
+  console.log("AAAAAA", a, labelformattedDates);
+
+  const result = buyurtmalar
+    .filter((item) => item.status == "yopilgan")
+    .filter((prod) => {
+      if (yopilganselectedFilial !== null) {
+        return prod.filial_id === yopilganselectedFilial;
+      }
+      return true;
+    })
+    .reduce((acc, order) => {
+      if (!acc[order.order_day]) {
+        acc[order.order_day] = 0;
+      }
+      acc[order.order_day] += 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+  const formatDatee = (dateString: string) => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const [day, month, year] = dateString.split("/");
+    return `${day} ${months[parseInt(month, 10) - 1]}`;
+  };
+
+  const resultArray = Object.entries(result).map(([order_day, count]) => {
+    const formattedDatee = formatDate(order_day);
+    return {
+      order_day: formattedDatee,
+      count,
+    };
+  });
+
+  console.log("LABEL TOTALSUM", result, resultArray);
+
+  const data = resultArray.map((item) => ({
+    x: item.order_day,
+    y: item.count,
+  }));
+
+  const config = {
+    data,
+    height: 250,
+    xField: "x",
+    yField: "y",
+    point: {
+      size: 1,
+      shape: "circle",
+    },
+    color: "blue",
+    yAxis: {
+      grid: {
+        line: {
+          style: {
+            stroke: "#ddd",
+            lineWidth: 5,
+          },
+        },
+      },
+    },
+  };
+
   return (
     <div className="bg-[#edeff3]">
       <div
@@ -282,8 +504,8 @@ const Xisobot = () => {
             <Input
               // prefix={<SearchOutlined />}
               placeholder="Qidirish"
-              // value={searchTerm}
-              // onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="rounded-[35px] bg-[#edeff3]"
             />
           </div>
@@ -395,7 +617,7 @@ const Xisobot = () => {
 
         <div>
           <div className="px-6 flex flex-col gap-3">
-            {filial.map((item) => (
+            {filteredFilial.map((item) => (
               <div
                 key={item.id}
                 className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
@@ -586,26 +808,69 @@ const Xisobot = () => {
         className="grid grid-cols-2 gap-4 px-10 pt-5"
       >
         <div className="  bg-white rounded h-[300px]">
-          <div className="shadow-md h-[50px] p-4 w-full">header</div>
-          <div className="">
-            {" "}
-            <LineChart
-              xAxis={[{ data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }]}
-              series={[
-                {
-                  data: [2, 3, 5.5, 8.5, 1.5, 5, 1, 4, 3, 8],
-                  showMark: ({ index }) => index % 2 === 0,
-                },
-              ]}
-              className="w-full"
-              height={270}
-            />
+          <div className="shadow-md h-[50px] w-full flex flex-row justify-between align-middle align-items-center">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "500",
+                padding: "15px",
+                paddingLeft: "31px",
+                display: "flex",
+                justifyContent: "start",
+                alignItems: "center",
+              }}
+            >
+              {" "}
+              Yopilgan buyurtmalar |{" "}
+              {yopilganselectedFilialnomi(yopilganselectedFilial)}
+            </Typography>
+            <div className="flex flex-row p-[10px]">
+              {/* <Form
+                onFinish={yopilganonFinish}
+                variant={componentVariant}
+                initialValues={{ variant: componentVariant }}
+                style={{ maxWidth: 600, width: 200 }}
+                className="flex flex-row"
+              >
+                <Form.Item name="date" className="w-52 border-white">
+                  <RangePicker />
+                </Form.Item>
+                <Form.Item>
+                  <Button htmlType="submit" className="border-none">
+                    <IoSearch />
+                  </Button>
+                </Form.Item>
+              </Form> */}
+
+              <Space direction="vertical">
+                <Space wrap>
+                  <Dropdown
+                    menu={{ items: items2 }}
+                    placement="bottomRight"
+                    arrow
+                    trigger={["click"]}
+                  >
+                    <div
+                      onClick={yopilganbtnFilter}
+                      className="w-[38px] h-[38px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                    >
+                      <div className="w-[28px] h-[28px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
+                        <CiFilter
+                          style={{ fontSize: "21px", color: "#8D9BA8" }}
+                        />
+                      </div>
+                    </div>
+                  </Dropdown>
+                </Space>
+              </Space>
+            </div>
+          </div>
+          <div className="h-[220px] ">
+            <Line {...config} />
           </div>
         </div>
-        <div className=" bg-white rounded h-[300px]">
-          <div className="shadow-md h-[50px] p-4 w-full">header</div>
-          <div className="">chart2</div>
-        </div>
+
         <div className=" bg-white rounded h-[300px]">
           <div className="shadow-md h-[50px] w-full flex flex-row justify-between align-middle align-items-center">
             <Typography
@@ -621,23 +886,47 @@ const Xisobot = () => {
               }}
             >
               {" "}
-              To'lov turlari | Xamma filallar
+              To'lov turlari | {selectfilialnomi(selectedFilial)}
             </Typography>
             <div className="flex flex-row p-[10px]">
               <Form
-                {...formItemLayout}
-                // onValuesChange={onFormVariantChange}
-                // variant={componentVariant}
-                style={{ maxWidth: 600, width: 150 }}
-                // initialValues={{ variant: componentVariant }}
+                onFinish={onFinish}
+                variant={componentVariant}
+                initialValues={{ variant: componentVariant }}
+                style={{ maxWidth: 600, width: 200 }}
+                className="flex flex-row"
               >
-                <Form.Item name="DatePicker" className="w-52">
+                <Form.Item name="date" className="w-52 border-white">
                   <DatePicker />
                 </Form.Item>
+                <Form.Item>
+                  <Button htmlType="submit" className="border-none">
+                    <IoSearch />
+                  </Button>
+                </Form.Item>
               </Form>
-              <button className="w-8 h-8 border-solid border-[4px] border-gray-100 rounded-full ps-[5px] ">
-                <CiFilter />
-              </button>
+
+              <Space direction="vertical">
+                <Space wrap>
+                  <Dropdown
+                    menu={{ items }}
+                    placement="bottomRight"
+                    arrow
+                    trigger={["click"]}
+                  >
+                    <div
+                      onClick={btnFilter}
+                      className="w-[38px] h-[38px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                    >
+                      <div className="w-[28px] h-[28px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
+                        <CiFilter
+                          style={{ fontSize: "21px", color: "#8D9BA8" }}
+                        />
+                      </div>
+                    </div>
+                  </Dropdown>
+                </Space>
+              </Space>
             </div>
           </div>
           <StyledChart
@@ -645,9 +934,10 @@ const Xisobot = () => {
             paymee={Payme()}
             naxtt={Naxt()}
             totall={total}
-            className=" flex flex-col gap-8 p-5"
+            className=" flex flex-row gap-12 p-5"
           >
-            <div className="flex flex-row  gap-5 align-items-center">
+            <div className=" flex flex-col gap-8 p-5 pt-2">
+              {" "}
               <Typography
                 style={{
                   padding: 0,
@@ -664,25 +954,6 @@ const Xisobot = () => {
                 <span className="bg-yellow-500 p-0 m-0 w-[6px] h-[6px] rounded-full me-2"></span>
                 Terminal - {Terminal()}
               </Typography>
-              <div className=" w-[200px] bg-gray-50 h-3 rounded ms-8 mt-1">
-                <div className=" chart-terminal bg-yellow-500 xisobott rounded"></div>
-              </div>
-              <Typography
-                style={{
-                  padding: 0,
-                  margin: 0,
-                  color: "#2D3A45",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  paddingLeft: "15px",
-                }}
-              >
-                {" "}
-                {Math.floor((Terminal() / total) * 100 * 100) / 100} %
-              </Typography>
-            </div>
-            <div className="flex flex-row gap-5 ">
-              {" "}
               <Typography
                 style={{
                   color: "#2D3A45",
@@ -697,26 +968,6 @@ const Xisobot = () => {
                 <span className="bg-green-500 w-[6px] h-[6px] rounded-full me-2"></span>
                 Payme - {Payme()}
               </Typography>
-              <div className=" w-[200px] bg-gray-50 h-3 rounded ms-[45px]  mt-1">
-                <div className=" chart-payme bg-green-500 xisobott rounded"></div>
-              </div>
-              <Typography
-                style={{
-                  color: "#2D3A45",
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  paddingLeft: "15px",
-                  display: "flex",
-                  justifyContent: "start",
-                  alignItems: "center",
-                }}
-              >
-                {" "}
-                {Math.floor((Payme() / total) * 100 * 100) / 100} %
-              </Typography>
-            </div>
-            <div className="flex flex-row gap-5 ">
-              {" "}
               <Typography
                 style={{
                   color: "#2D3A45",
@@ -731,35 +982,88 @@ const Xisobot = () => {
                 <span className="bg-[rgb(62,248,248)] w-[6px] h-[6px] rounded-full me-2"></span>
                 Naxt - {Naxt()}
               </Typography>
-              <div className="w-[200px] h-3 rounded ms-14  mt-1 bg-gray-50">
-                <div className="chart-naxt  bg-[rgb(62,248,248)] xisobott rounded"></div>
-              </div>
-              <Typography
+              <div
+                className="bg-slate-100 p-2 mt-0 w-[120px]"
                 style={{
                   color: "#2D3A45",
                   fontSize: "14px",
                   fontWeight: "500",
-                  paddingLeft: "15px",
-                  display: "flex",
-                  justifyContent: "start",
-                  alignItems: "center",
+                  marginLeft: "10px",
+                  textAlign: "center",
                 }}
               >
-                {" "}
-                {Math.floor((Naxt() / total) * 100 * 100) / 100} %
-              </Typography>
+                {total}
+              </div>
             </div>
-            <div
-              className="bg-slate-100 p-2 mt-0 w-[120px]"
-              style={{
-                color: "#2D3A45",
-                fontSize: "14px",
-                fontWeight: "500",
-                marginLeft: "20px",
-                textAlign: "center",
-              }}
-            >
-              {total}
+            <div className=" flex flex-col gap-8 p-5 pt-2">
+              {" "}
+              <div className="flex flex-row  gap-5 align-items-center">
+                <div className=" w-[200px] bg-gray-50 h-3 rounded mt-1">
+                  <div className=" chart-terminal bg-yellow-500 xisobott rounded"></div>
+                </div>
+                <Typography
+                  style={{
+                    padding: 0,
+                    margin: 0,
+                    color: "#2D3A45",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    paddingLeft: "15px",
+                  }}
+                >
+                  {" "}
+                  {total !== 0
+                    ? Math.floor((Terminal() / total) * 100 * 100) / 100
+                    : 0}{" "}
+                  %
+                </Typography>
+              </div>
+              <div className="flex flex-row gap-5 ">
+                {" "}
+                <div className=" w-[200px] bg-gray-50 h-3 rounded   mt-1">
+                  <div className=" chart-payme bg-green-500 xisobott rounded"></div>
+                </div>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    paddingLeft: "15px",
+                    display: "flex",
+                    justifyContent: "start",
+                    alignItems: "center",
+                  }}
+                >
+                  {" "}
+                  {total !== 0
+                    ? Math.floor((Payme() / total) * 100 * 100) / 100
+                    : 0}{" "}
+                  %
+                </Typography>
+              </div>
+              <div className="flex flex-row gap-5 ">
+                {" "}
+                <div className="w-[200px] h-3 rounded   mt-1 bg-gray-50">
+                  <div className="chart-naxt  bg-[rgb(62,248,248)] xisobott rounded"></div>
+                </div>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    paddingLeft: "15px",
+                    display: "flex",
+                    justifyContent: "start",
+                    alignItems: "center",
+                  }}
+                >
+                  {" "}
+                  {total !== 0
+                    ? Math.floor((Naxt() / total) * 100 * 100) / 100
+                    : 0}{" "}
+                  %
+                </Typography>
+              </div>
             </div>
           </StyledChart>
         </div>
@@ -769,7 +1073,6 @@ const Xisobot = () => {
 };
 
 export default Xisobot;
-
 const StyledChart = styled("div")<{
   terminall: number;
   paymee: number;
@@ -778,17 +1081,20 @@ const StyledChart = styled("div")<{
 }>`
   .chart-terminal {
     background-color: #eab308;
-    width: ${(props) => (props.terminall / props.totall) * 100}%;
+    width: ${(props) =>
+      props.totall !== 0 ? (props.terminall / props.totall) * 100 : 0}%;
     height: 100%;
   }
   .chart-payme {
     background-color: #22c55e;
-    width: ${(props) => (props.paymee / props.totall) * 100}%;
+    width: ${(props) =>
+      props.totall !== 0 ? (props.paymee / props.totall) * 100 : 0}%;
     height: 100%;
   }
   .chart-naxt {
     background-color: #3ef8f8;
-    width: ${(props) => (props.naxtt / props.totall) * 100}%;
+    width: ${(props) =>
+      props.totall !== 0 ? (props.naxtt / props.totall) * 100 : 0}%;
     height: 100%;
   }
 `;
