@@ -12,11 +12,9 @@ import { IoExitOutline } from "react-icons/io5";
 import "./index.css";
 import { Layout as AntLayout, Menu, theme } from "antd";
 import { Link, useLocation } from "react-router-dom";
-import Search from "antd/es/input/Search";
 
 import "./style.css";
 import bitmap from "./Bitmap.png";
-import axios from "axios";
 const { Header, Content, Footer, Sider } = AntLayout;
 
 const items = [
@@ -104,28 +102,20 @@ const items = [
     label: <Link to="/xarita">Xarita</Link>,
   },
 ];
-interface Category {
-  id: number;
-  MainKateg: number;
-  name: string;
-}
-
-interface SelecCat {
-  [key: string]: string[];
-}
-interface Product {
-  id: number;
-  name: string;
-  type: number;
-  price: string;
-  desc: string;
-  img: string;
-}
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  const [selectedKey, setSelectedKey] = useState([""]);
+  const [openKeys, setOpenKeys] = useState([""]);
+  const location = useLocation();
+  console.log(location);
+
+  useEffect(() => {
+    setSelectedKey([location.pathname.slice(1)]);
+  }, []);
 
   return (
     <AntLayout>
@@ -165,7 +155,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <Menu
             theme="light"
             mode="inline"
-            defaultSelectedKeys={["buyurtmalar"]}
+            selectedKeys={selectedKey}
+            onSelect={({ selectedKeys }) => {
+              setSelectedKey(selectedKeys);
+            }}
+            openKeys={openKeys}
+            onOpenChange={(keys) => {
+              setOpenKeys(keys);
+            }}
             items={items}
           />
 
