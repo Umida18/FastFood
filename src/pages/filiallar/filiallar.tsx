@@ -20,21 +20,22 @@ import { FiEdit2 } from "react-icons/fi";
 import { IoLocationOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
+import { Addres, Branch } from "../../type/type";
 
-export interface Branch {
-  id: number;
-  nameUz: string;
-  nameRu: string;
-  location: string;
-  operatorId: number;
-  hours: string;
-  geometry: [number, number];
-}
+// export interface Branch {
+//   id: number;
+//   nameUz: string;
+//   nameRu: string;
+//   location: string;
+//   operatorId: number;
+//   hours: string;
+//   geometry: [number, number];
+// }
 
-interface Addres {
-  L1: number | string;
-  L2: number | string;
-}
+// interface Addres {
+//   L1: number | string;
+//   L2: number | string;
+// }
 
 const BranchTable = () => {
   const [data, setData] = useState<Branch[]>([]);

@@ -26,86 +26,17 @@ import { FiTrash2 } from "react-icons/fi";
 import { FiUserPlus } from "react-icons/fi";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 import CardOrdered from "./card";
-
-export interface Payment {
-  order_amount: string;
-  delivery_amount: string;
-  total_amount: string;
-  payment_method: number;
-}
-
-export interface Order {
-  id: number;
-  order_id: number;
-  order_time: string;
-  order_day: string;
-  filial_id: number;
-  status: string;
-  order_details: Payment;
-  mijoz_id: number;
-}
-export interface PaymentM {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  MainKateg: number;
-  nameUz: string;
-  nameRu: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  type: number;
-  desc: string;
-  img: string;
-  price: number;
-  quantity: number;
-  originalPrice: number;
-  isProductAdded: boolean;
-}
-
-interface Mijoz {
-  id: number;
-  firstName: string;
-  lastName: string;
-  ordersC: number;
-  status: string;
-  phone: string;
-}
-interface Branch {
-  id: number;
-  nameUz: string;
-  nameRu: string;
-  location: string;
-  operatorId: number;
-  telefon: string;
-  hours: string;
-  geometry: [];
-}
-interface Hodimlar {
-  id: number;
-  fistN: string;
-  lastN: string;
-  thName: string;
-  phone: string;
-  lavozim: string;
-  filialId: number;
-}
-interface Addres {
-  L1: number | string;
-  L2: number | string;
-}
-
-interface Delivey {
-  id: number;
-  filialId: number;
-  narxi: number;
-  minimalNarx: string;
-}
+import {
+  Addres,
+  Branch,
+  Category,
+  Delivey,
+  Hodimlarr,
+  Mijoz,
+  Order,
+  PaymentM,
+  Product,
+} from "../../type/type";
 
 export const Buyurtmalar: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -122,9 +53,9 @@ export const Buyurtmalar: React.FC = () => {
   const [selectedClient, setSelectedClient] = useState<Mijoz | null>(null);
   const [address, setAddress] = useState<Addres[]>([]);
   const [filial, setFilial] = useState<Branch[]>([]);
-  const [hodim, setHodim] = useState<Hodimlar[]>([]);
+  const [hodim, setHodim] = useState<Hodimlarr[]>([]);
   const [selectedFilial, setSelectedFilial] = useState<Branch | null>(null);
-  const [selectedOperator, setSelectedOperator] = useState<Hodimlar | null>(
+  const [selectedOperator, setSelectedOperator] = useState<Hodimlarr | null>(
     null
   );
   const [delivery, setDelivery] = useState<Delivey[]>([]);

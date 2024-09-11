@@ -22,26 +22,10 @@ import { FaPlus } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
 import { PlusOutlined } from "@ant-design/icons";
+import { Category, Product, SelecCat } from "../../type/type";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
-interface Product {
-  id: number;
-  name: string;
-  type: number;
-  price: number;
-  desc: string;
-  img: string;
-}
-interface Category {
-  id: number;
-  MainKateg: number;
-  nameUz: string;
-  nameRu: string;
-}
-interface SelecCat {
-  [key: string]: string[];
-}
 const { Option } = Select;
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {

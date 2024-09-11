@@ -17,22 +17,23 @@ import { IoSearch } from "react-icons/io5";
 import axios from "axios";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiFilter } from "react-icons/ci";
-import { Branch } from "../filiallar/filiallar";
-import { Order, PaymentM } from "../buyurtmalar/buyurmalar";
+// import { Branch } from "../filiallar/filiallar";
+// import { Order, PaymentM } from "../buyurtmalar/buyurmalar";
 import { GrUpdate } from "react-icons/gr";
 import { MdOutlineSystemUpdateAlt } from "react-icons/md";
 import { FaChartLine } from "react-icons/fa";
 import { Hodimlar } from "../hodimlar";
 import type { FormProps, MenuProps } from "antd";
 import styled from "@emotion/styled";
+import { Branch, Hodimlarr, Narx, Order, PaymentM } from "../../type/type";
 const { Option } = Select;
 
-interface Narx {
-  id: number;
-  filialId: number;
-  narxi: number;
-  minimalNarx: string;
-}
+// interface Narx {
+//   id: number;
+//   filialId: number;
+//   narxi: number;
+//   minimalNarx: string;
+// }
 
 const Xisobot = () => {
   const [products, setProducts] = useState<Narx[]>([]);
@@ -41,7 +42,7 @@ const Xisobot = () => {
   const [buyurtmalar, setBuyurtmalar] = useState<Order[]>([]);
   const [tolovTuri, setTolovTuri] = useState<PaymentM[]>([]);
   const [selectedView, setSelectedView] = useState<string>("chart");
-  const [hodimlar, setHodimlar] = useState<Hodimlar[]>([]);
+  const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
   const [filterDate, setFilterDate] = useState<string>("");
   const [showFilter, setShowFilter] = useState(true);
   const [showFilterr, setShowFilterr] = useState(true);

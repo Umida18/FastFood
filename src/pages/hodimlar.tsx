@@ -5,32 +5,11 @@ import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import { FaPlus } from "react-icons/fa6";
+import { Filial } from "../type/type";
+import { Hodimlarr } from "../type/type";
 
-export interface Hodimlar {
-  id: number;
-  fistN: string;
-  lastN: string;
-  thName: string;
-  phone: string;
-  lavozim: string;
-  filialId: number;
-}
-interface Geom {
-  0: number;
-  1: number;
-}
-interface Filial {
-  id: number;
-  nameUz: string;
-  nameRu: string;
-  location: string;
-  geometry: Geom;
-  operator: string;
-  telefon: string;
-  hours: string;
-}
 export const Hodimlar = () => {
-  const [hodimlar, setHodimlar] = useState<Hodimlar[]>([]);
+  const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
   const [filial, setfilial] = useState<Filial[]>([]);
   const [searchVal, setSearchVal] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,7 +40,7 @@ export const Hodimlar = () => {
     setDrawerOpen(false);
   };
 
-  const showDrawer = (hodim?: Hodimlar) => {
+  const showDrawer = (hodim?: Hodimlarr) => {
     if (hodim) {
       setEditingCatId(hodim.id);
       form.setFieldsValue({

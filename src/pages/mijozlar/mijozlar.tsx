@@ -22,16 +22,17 @@ import { FaPlus } from "react-icons/fa6";
 import axios from "axios";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
+import { Client } from "../../type/type";
 
 const { Option } = Select;
 
-interface Client {
-  key: string;
-  name: string;
-  phone: string;
-  orderCount: number;
-  status: "Aktiv" | "Block";
-}
+// interface Client {
+//   key: string;
+//   name: string;
+//   phone: string;
+//   orderCount: number;
+//   status: "Aktiv" | "Block";
+// }
 
 const ClientTable: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
