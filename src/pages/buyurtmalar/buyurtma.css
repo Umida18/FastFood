@@ -173,14 +173,17 @@
 .contLast {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
-  height: 630px !important;
+  height: 540px !important;
   overflow-y: scroll;
+  /* width: 260px; */
+  padding-inline: 15px;
 }
 .titleOrder {
   position: sticky !important;
   top: 0; /* Stick the title at the top */
   z-index: 1; /* Ensure it's above other content */
   background-color: #edeff3;
+  /* height: 50px; */
 }
 .cont1 {
   scrollbar-width: none !important;

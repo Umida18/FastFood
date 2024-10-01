@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Branch } from "../../pages/filiallar/filiallar";
+import { Filial } from "../../type/type";
 
 const xaritaSlice = createSlice({
   name: "xarita",
@@ -9,9 +9,9 @@ const xaritaSlice = createSlice({
   reducers: {
     setXarita: (
       state: {
-        xarita: Branch[];
+        xarita: Filial[];
       },
-      action: PayloadAction<Branch[]>
+      action: PayloadAction<Filial[]>
     ) => {
       state.xarita = action.payload;
     },

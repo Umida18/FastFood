@@ -1,23 +1,81 @@
-.ant-table-wrapper .ant-table-tbody > tr {
-  /* border-radius: 10px !important; */
-  /* background-color: red !important; */
-  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2) !important;
+.ant-table-wrapper
+  .ant-table-container
+  table
+  > thead
+  > tr:first-child
+  > th:first-child {
+  border-radius: 0 !important;
+  height: 36px !important;
 }
 
-td.ant-table-cell {
+.ant-table-wrapper
+  .ant-table-container
+  table
+  > thead
+  > tr:first-child
+  > th:last-child {
   border-radius: 0 !important;
+  border-bottom: none !important;
+  height: 36px !important;
+}
+
+.ant-table-wrapper .ant-table {
+  background: transparent !important;
+}
+
+.ant-table-wrapper .ant-table-thead > tr {
+  position: sticky !important;
+  z-index: 5 !important;
+  top: 0 !important;
+  background-color: white !important;
+  height: 36px !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr {
+  border-radius: 10px !important;
+  background-color: white !important;
+}
+
+.ant-table-wrapper .ant-table-thead > tr > th {
+  white-space: nowrap !important;
+  border-bottom: none !important;
 }
 
 .ant-table-wrapper .ant-table-tbody > tr > td {
-  border-radius: 0 !important;
+  border-top: 1px solid #edeff3 !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  border-bottom: 1px solid #edeff3 !important;
+  border-radius: 10px !important;
+}
+.ant-table-wrapper .ant-table-tbody > tr {
+  border-radius: 10px !important;
+  background-color: red;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+}
+.ant-table-wrapper table {
+  border-spacing: 0 12px !important;
 }
 
-.ant-table-wrapper .ant-table-tbody tr {
+tbody tr {
+  background-color: white !important;
   border-radius: 10px !important;
 }
 
-.ant-table-thead {
-  padding: 0 !important;
-  margin: 0 !important;
-  width: 100% !important;
+thead {
+  background-color: white !important;
+  height: 36px !important;
+}
+
+thead tr {
+  background-color: white !important;
+  height: 36px !important;
+}
+
+.contMain {
+  overflow-y: scroll;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 560px;
 }

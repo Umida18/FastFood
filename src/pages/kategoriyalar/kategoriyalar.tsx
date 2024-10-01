@@ -135,10 +135,10 @@ export const Kategoriyalar = () => {
   return (
     <div className="bg-[#edeff3] min-h-[95vh]">
       <div className="flex bg-white">
-        <div className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
+        <div className="flex border-x-2 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3 items-center">
           <div
             onClick={() => showDrawer()}
-            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center"
+            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center cursor-pointer"
           >
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
@@ -147,7 +147,7 @@ export const Kategoriyalar = () => {
               width: "120px",
               color: "#2D3A45",
               lineHeight: "18px",
-              fontWeight: "600px",
+              fontWeight: 600,
             }}
           >
             Yangi kategoriya qo'shish

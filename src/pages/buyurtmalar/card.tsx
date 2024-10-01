@@ -69,7 +69,7 @@ const CardOrdered: React.FC<ICardProps> = ({
           <div>
             <div
               key={order.id}
-              className="flex flex-col bg-white mt-6 w-[234px] h-[345px] px-4 py-2 rounded-md shadow-2xl"
+              className="flex flex-col bg-white mb-6 w-[234px] h-[345px] px-4 py-2 rounded-md shadow-lg"
             >
               <div className="flex flex-row justify-between gap-4 py-3 items-center ">
                 <div className="flex justify-center items-center content-center">
@@ -166,9 +166,9 @@ const CardOrdered: React.FC<ICardProps> = ({
                         fontWeight: "bolder",
                       }}
                     >
-                      {/* <PriceComponent
+                      <PriceComponent
                         price={order.order_details.total_amount}
-                      /> */}
+                      />
                     </Typography>
                   </div>
                 </div>

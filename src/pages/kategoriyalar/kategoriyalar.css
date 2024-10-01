@@ -1,3 +1,6 @@
-krvkr {
-  color: #9e9fa0;
+.contMain {
+  overflow-y: scroll;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 560px;
 }

@@ -72,3 +72,10 @@ thead tr {
   background-color: white !important;
   height: 36px !important;
 }
+
+.contMain {
+  overflow-y: scroll;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+  height: 560px;
+}

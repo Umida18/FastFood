@@ -85,16 +85,10 @@ export const Maxsulotlar = () => {
       setDataCat(responseCat.data);
 
       const responseProducts = await axios.get(
-        `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar?page=${pageNumber}&limit=5`
+        `https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar`
       );
-      if (responseProducts?.data?.items?.length === 0) {
-        setHasMore(false);
-      } else {
-        setProducts((prevProducts) => [
-          ...prevProducts,
-          ...responseProducts?.data?.items,
-        ]);
-      }
+
+      setProducts(responseProducts.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -277,25 +271,22 @@ export const Maxsulotlar = () => {
     return <div>{formatPrice(price)} UZS</div>;
   };
 
-  const loadMoreProducts = () => {
-    setPage((prevPage) => prevPage + 1);
-  };
   return (
     <div className="bg-[#edeff3]">
       <div className="flex bg-white">
-        <div className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3">
+        <div className="flex border-x-2 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3 items-center">
           <div
-            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center"
             onClick={() => showDrawer()}
+            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center cursor-pointer"
           >
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
           <Typography
             style={{
-              width: "100px",
+              width: "120px",
               color: "#2D3A45",
               lineHeight: "18px",
-              fontWeight: "600px",
+              fontWeight: 600,
             }}
           >
             Yangi maxsulot qo'shish
@@ -481,7 +472,7 @@ export const Maxsulotlar = () => {
         </div>
 
         <div>
-          <div className="px-6 flex flex-col gap-3">
+          <div className="px-6 flex flex-col gap-3 contMain">
             {filteredProducts.map((item) => (
               <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
                 <div className="flex w-[290px]">
@@ -532,27 +523,6 @@ export const Maxsulotlar = () => {
               </div>
             ))}
           </div>
-        </div>
-        <div className="flex justify-center content-center items-center my-3">
-          {hasMore ? (
-            <div className="flex justify-center content-center items-center my-3">
-              <Button
-                style={{
-                  border: "2px solid #8D9BA8",
-                  background: "transparent",
-                  width: "1275px",
-                  height: "40px",
-                }}
-                onClick={loadMoreProducts}
-              >
-                Yana yuklash
-              </Button>
-            </div>
-          ) : (
-            <div className="flex justify-center content-center items-center my-3">
-              <p>Barcha mahsulotlar yuklandi</p>
-            </div>
-          )}
         </div>
       </div>
     </div>

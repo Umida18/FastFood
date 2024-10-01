@@ -1,13 +1,12 @@
 import { Map, YMaps, Placemark, ZoomControl } from "@pbe/react-yandex-maps";
 import React, { useEffect, useState } from "react";
-import { Branch } from "./filiallar/filiallar";
 import axios from "axios";
 import { setXarita } from "../store/slices/xaritaSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store";
-import { Hodimlar } from "./hodimlar";
+import { Filial, Hodimlarr } from "../type/type";
 export const Xarita = () => {
-  const [hodimlar, setHodimlar] = useState<Hodimlar[]>([]);
+  const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
 
   const xarita = useSelector((state: RootState) => state.xarita.xarita);
   const dispatch = useDispatch();
@@ -64,7 +63,7 @@ export const Xarita = () => {
         >
           <ZoomControl options={{ position: { right: 15, top: 15 } }} />
           {/* <TypeSelector options={{ float: "left" }} /> */}{" "}
-          {xarita.map((item: Branch) => {
+          {xarita.map((item: Filial) => {
             return (
               <Placemark
                 geometry={item.geometry}

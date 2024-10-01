@@ -1,70 +1,108 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Table,
-  Input,
+  Checkbox,
   Drawer,
-  Form,
-  Typography,
-  Space,
   Dropdown,
+  Form,
+  Image,
+  Input,
   Select,
+  Space,
+  Typography,
+  Upload,
   message,
 } from "antd";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
-import { FaPlus } from "react-icons/fa6";
 import axios from "axios";
-import "./filiallar.css";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { FiEdit2 } from "react-icons/fi";
-import { IoLocationOutline } from "react-icons/io5";
+import { RiDeleteBinLine } from "react-icons/ri";
+import "./filiallar.css";
+import type { GetProp, MenuProps, UploadFile, UploadProps } from "antd";
+import { FaPlus } from "react-icons/fa6";
+import { IoSearchOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
-import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
-import { Addres, Branch } from "../../type/type";
+import { PlusOutlined } from "@ant-design/icons";
+import { Branch, Category, Product, SelecCat } from "../../type/type";
 
-// export interface Branch {
-//   id: number;
-//   nameUz: string;
-//   nameRu: string;
-//   location: string;
-//   operatorId: number;
-//   hours: string;
-//   geometry: [number, number];
-// }
+const { Option } = Select;
 
-// interface Addres {
-//   L1: number | string;
-//   L2: number | string;
-// }
+export const Filiallar = () => {
+  const [filial, setFilial] = useState<Branch[]>([]);
+  const [showFilter, setShowFilter] = useState(true);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [categoryProd, setCategoryProd] = useState<number | null>(null);
 
-const BranchTable = () => {
-  const [data, setData] = useState<Branch[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isDrawerVisible, setIsDrawerVisible] = useState<boolean>(false);
-  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
-  const [address, setAddress] = useState<Addres[]>([]);
-  const [mapVisible, setMapVisible] = useState<boolean>(false);
-  const [mapCoords, setMapCoords] = useState<[number, number] | null>(null);
+  const [searchVal, setSearchVal] = useState("");
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [editingProdId, setEditingProdId] = useState<number | null>(null);
+  const [form] = Form.useForm();
+  const [page, setPage] = useState(1);
+
+  const showDrawer = (product?: Branch) => {
+    if (product) {
+      setEditingProdId(product.id);
+      form.setFieldsValue({
+        name: product.nameUz,
+        // type: product.type,
+        price: product.location,
+        desc: product.telefon,
+        img: product.hours,
+      });
+    } else {
+      setEditingProdId(null);
+      form.resetFields();
+    }
+    setOpen(true);
+  };
+
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const fetchData = async (pageNumber: number) => {
+    try {
+      const responseCat = await axios.get(
+        "https://3c2999041095f9d9.mokky.dev/filial"
+      );
+      setFilial(responseCat.data);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
 
   useEffect(() => {
-    const initialData = async () => {
-      try {
-        const response = await axios.get(
-          "https://3c2999041095f9d9.mokky.dev/filial"
-        );
-        setData(response.data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-    };
-    initialData();
-  }, []);
+    fetchData(page);
+  }, [page]);
 
-  const handleDelete = async (id: number) => {
+  const btnFilter = () => {
+    setShowFilter(!showFilter);
+    setDropdownVisible(!dropdownVisible);
+  };
+
+  const filteredProducts = (Array.isArray(filial) ? filial : []).filter(
+    (prod) => {
+      return (
+        prod.nameUz &&
+        prod.nameUz.toLowerCase().includes(searchVal.toLowerCase())
+      );
+    }
+  );
+
+  const CategName = (id: number) => {
+    const categ = filial.find((c) => c.id === id);
+    return categ ? categ.nameUz : "-";
+  };
+
+  const deleteProd = async (id: number) => {
     try {
       await axios.delete(`https://3c2999041095f9d9.mokky.dev/filial/${id}`);
-      const updatedFilials = data.filter((p) => p.id !== id);
-      setData(updatedFilials);
+
+      const updatedProducts = filial.filter((p) => p.id !== id);
+      setFilial(updatedProducts);
+
       message.success("Muvafaqiyatli o'chirildi");
     } catch (error) {
       message.error("O'chirishda xatolik!");
@@ -72,217 +110,268 @@ const BranchTable = () => {
     }
   };
 
-  const handleEdit = (branch: Branch) => {
-    setEditingBranch(branch);
-    setIsDrawerVisible(true);
-  };
+  const addEditProd = async (values: {
+    name: string;
+    type: number;
+    price: string;
+    desc: string;
+    img: string;
+  }) => {
+    try {
+      const productData = {
+        ...values,
+        price: parseFloat(values.price),
+        img: previewUrl || "",
+      };
+      if (editingProdId === null) {
+        const response = await axios.post(
+          "https://3c2999041095f9d9.mokky.dev/filial",
+          productData
+        );
+        setFilial([...filial, response.data]);
+        message.success("Maxsulot muvaffaqiyatli qo'shildi!");
+      } else {
+        await axios.patch(
+          `https://3c2999041095f9d9.mokky.dev/filial/${editingProdId}`,
+          productData
+        );
+        setFilial(
+          filial.map((prod) =>
+            prod.id === editingProdId ? { ...prod, ...productData } : prod
+          )
+        );
+        message.success("Maxsulot muvaffaqiyatli yangilandi!");
+      }
 
-  const handleDrawerOk = (values: Omit<Branch, "id" | "geometry">) => {
-    if (editingBranch) {
-      setData(
-        data.map((branch) =>
-          branch.id === editingBranch.id ? { ...branch, ...values } : branch
-        )
-      );
-    } else {
-      setData([...data, { id: data.length + 1, geometry: [0, 0], ...values }]);
+      onClose();
+    } catch (error) {
+      message.error("Failed to add product. Please try again.");
+      console.error("Error adding product: ", error);
     }
-    setIsDrawerVisible(false);
-    setEditingBranch(null);
   };
+  const PriceComponent = ({ price }: { price: number }) => {
+    const formatPrice = (price: number) => {
+      return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
 
-  const handleDrawerCancel = () => {
-    setIsDrawerVisible(false);
-    setEditingBranch(null);
+    return <div>{formatPrice(price)} UZS</div>;
   };
-
-  const handleMapClick = (e: any) => {
-    const coords = e.get("coords");
-    setAddress([{ L1: coords[0], L2: coords[1] }]);
-    console.log(address);
-  };
-
-  const openMap = (branch: Branch) => {
-    setMapCoords(branch.geometry);
-    setMapVisible(true);
-  };
-
-  const closeMap = () => {
-    setMapVisible(false);
-    setMapCoords(null);
-  };
-
-  const filteredData = data.filter(
-    (branch) =>
-      branch.nameUz.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.nameRu.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      branch.location.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const columns = [
-    { title: "FILIAL NOMI (UZ)", dataIndex: "nameUz", key: "nameUz" },
-    { title: "FILIAL NOMI (RU)", dataIndex: "nameRu", key: "nameRu" },
-    { title: "MO'LJAL", dataIndex: "location", key: "location" },
-    { title: "ISH VAQTI", dataIndex: "hours", key: "hours" },
-    {
-      title: "ACTION",
-      key: "action",
-      render: (_: any, record: Branch) => (
-        <span>
-          <Button
-            icon={<IoLocationOutline />}
-            onClick={() => openMap(record)}
-          />
-          <Button icon={<FiEdit2 />} onClick={() => handleEdit(record)} />
-          <Button
-            icon={<RiDeleteBin6Line />}
-            onClick={() => handleDelete(record.id)}
-          />
-        </span>
-      ),
-    },
-  ];
 
   return (
-    <div className="p-0 m-0  bg-[#edeff3]">
-      <div
-        className=" bg-white"
-        style={{
-          display: "flex",
-          justifyContent: "start",
-          gap: 3,
-          margin: "0",
-          padding: "0",
-        }}
-      >
-        <div
-          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px]  justify-center gap-3"
-          onClick={() => setIsDrawerVisible(true)}
-        >
-          <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center">
+    <div className="bg-[#edeff3]">
+      <div className="flex bg-white">
+        <div className="flex border-x-2 border-x-[#edeff3] w-[205px] h-[80px] p-3 justify-center gap-3 items-center">
+          <div
+            onClick={() => showDrawer()}
+            className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center cursor-pointer"
+          >
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
-
           <Typography
             style={{
-              width: "100px",
+              width: "120px",
               color: "#2D3A45",
               lineHeight: "18px",
-              fontWeight: "600",
+              fontWeight: 600,
             }}
           >
             Yangi filial qo'shish
           </Typography>
         </div>
-        <div
+        <div className="w-[530px] flex justify-center content-center items-center gap-5">
+          <div className="flex justify-center content-center items-center">
+            <div className="w-[300px] h-[48px] bg-[#edeff3] flex flex-row rounded-[35px] justify-between py-3 px-6 items-center">
+              <input
+                placeholder="Qidirish"
+                style={{
+                  backgroundColor: "#edeff3",
+                  border: "none",
+                  background: "transparent",
+                  outline: "none",
+                }}
+                value={searchVal}
+                onChange={(e) => setSearchVal(e.target.value)}
+              />
+              <IoSearchOutline style={{ fontSize: "21px", color: "#8D9BA8" }} />
+            </div>
+          </div>
+        </div>
+        <Drawer
+          title={
+            editingProdId ? "Maxsulotni Tahrirlash" : "Yangi maxsulot qo'shish"
+          }
+          onClose={onClose}
+          open={open}
           style={{
             display: "flex",
-            justifyContent: "start",
-            gap: 3,
+            flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
-          <div className="w-[300px] h-[48px]  py-3 px-6 items-center">
-            <Input
-              prefix={<SearchOutlined />}
-              placeholder="Qidirish"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="rounded-[35px] bg-[#edeff3]"
-            />
+          <Form form={form} layout="vertical" onFinish={addEditProd}>
+            <Form.Item name="name" label="Maxsulot nomi">
+              <Input />
+            </Form.Item>
+            <Form.Item name="type" label="Kategoriya">
+              <Select
+                style={{ width: 200 }}
+                value={categoryProd}
+                onChange={(value) => setCategoryProd(value)}
+              >
+                {filial.map((item, index) => (
+                  <Option key={item.id} value={item.id}>
+                    {item.nameUz}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item name="price" label="Narxi">
+              <Input />
+            </Form.Item>
+            <Form.Item name="desc" label="Qo'shimcha ma'lumot">
+              <Input />
+            </Form.Item>
+            <div>
+              <Button
+                htmlType="submit"
+                style={{ backgroundColor: "#20D472", border: "none" }}
+              >
+                {editingProdId ? "Yangilash" : "Saqlash"}
+              </Button>
+            </div>
+          </Form>
+        </Drawer>
+      </div>
+
+      <div className=" bg-[#edeff3] min-h-[95vh] mt-3">
+        <div className="flex justify-between bg-white my-[20px] h-[45px] py-3 px-10">
+          <div className="flex justify-center align-middle uppercase ">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "bolder",
+                // paddingLeft: "15px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Maxsulot
+            </Typography>
+          </div>
+          <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "bolder",
+                paddingLeft: "15px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Kategoriya
+            </Typography>
+          </div>
+          <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "bolder",
+                paddingLeft: "15px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Narxi
+            </Typography>
+          </div>
+          <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "bolder",
+                paddingLeft: "15px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Qo’shimcha
+            </Typography>
+          </div>
+          <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
+            <Typography
+              style={{
+                color: "#2D3A45",
+                fontSize: "14px",
+                fontWeight: "bolder",
+                paddingLeft: "15px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginRight: "55px",
+              }}
+            >
+              ACTION
+            </Typography>
+          </div>
+        </div>
+
+        <div>
+          <div className="px-6 flex flex-col gap-3 contMain">
+            {filteredProducts.map((item) => (
+              <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
+                <div className="flex w-[290px]">
+                  <Typography
+                    style={{
+                      marginLeft: "20px",
+                      fontSize: "15px",
+                      color: "#2D3A45",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {item.nameUz}
+                  </Typography>
+                </div>
+                {/* <div className="w-[290px] text-[#2D3A45] text-[15px] flex items-center">
+                  {CategName(item.type)}
+                </div> */}
+                {/* <div className="w-[250px] text-[#2D3A45] text-[15px] flex items-center">
+                  <PriceComponent price={item.location} />
+                </div> */}
+                <div className="w-[300px] text-[#2D3A45] text-[15px] flex items-center">
+                  {item.telefon}
+                </div>
+                <div className="flex gap-4">
+                  <div
+                    onClick={() => showDrawer(item)}
+                    className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  >
+                    <div className="w-[32px] h-[32px] bg-white rounded-full  flex justify-center content-center items-center">
+                      <FiEdit2 style={{ fontSize: "16px" }} />
+                    </div>
+                  </div>
+                  <div
+                    onClick={() => deleteProd(item.id)}
+                    className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  >
+                    <div className="w-[32px] h-[32px] bg-white rounded-full  flex justify-center content-center items-center text-[15px]">
+                      <RiDeleteBinLine style={{ fontSize: "16px" }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-      <Table
-        columns={columns}
-        dataSource={filteredData}
-        rowKey="id"
-        className=" rounded-0"
-      />
-
-      <Drawer
-        title={editingBranch ? "Filialni tahrirlash" : "Yangi filial qo'shish"}
-        visible={isDrawerVisible}
-        onClose={handleDrawerCancel}
-        width={400}
-      >
-        <Form
-          initialValues={
-            editingBranch || {
-              nameUz: "",
-              nameRu: "",
-              location: "",
-              hours: "",
-            }
-          }
-          onFinish={handleDrawerOk}
-          layout="vertical"
-        >
-          <Form.Item
-            label="FILIAL NOMI (UZ)"
-            name="nameUz"
-            rules={[
-              { required: true, message: "Iltimos, filial nomini kiriting!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="FILIAL NOMI (RU)"
-            name="nameRu"
-            rules={[
-              { required: true, message: "Iltimos, filial nomini kiriting!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="MO'LJAL"
-            name="location"
-            rules={[
-              { required: true, message: "Iltimos, mo'ljalni kiriting!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="ISH VAQTI"
-            name="hours"
-            rules={[
-              { required: true, message: "Iltimos, ish vaqtini kiriting!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Saqlash
-            </Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
-
-      <Drawer
-        title="Filial Manzili"
-        visible={mapVisible}
-        onClose={closeMap}
-        width={600}
-      >
-        <YMaps>
-          <Map
-            defaultState={{
-              center: mapCoords || [41.327169, 69.282666],
-              zoom: 13,
-            }}
-            width="100%"
-            height="400px"
-          >
-            {mapCoords && <Placemark geometry={mapCoords} />}
-          </Map>
-        </YMaps>
-      </Drawer>
     </div>
   );
 };
-
-export default BranchTable;

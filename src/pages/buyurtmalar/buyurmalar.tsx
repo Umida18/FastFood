@@ -8,6 +8,7 @@ import {
   Input,
   Select,
   Form,
+  message,
 } from "antd";
 import { FaPlus, FaRegUser } from "react-icons/fa6";
 import { IoCheckmark, IoClipboardOutline } from "react-icons/io5";
@@ -65,42 +66,65 @@ export const Buyurtmalar: React.FC = () => {
   const [selectedTolovTuri, setSelectedTolovTuri] = useState<string>("");
   const [quantityProd, setQuantityProd] = useState<number | null>(null);
   const [totalProductP, setTotalProductP] = useState<number | null>(null);
-  const [orderNumber, setOrderNumber] = useState<number>();
-
+  const [orderNumber, setOrderNumber] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [form] = Form.useForm();
   const showDrawer = () => {
     setOpen(true);
+    form.resetFields();
+
+    setAddProdList([]);
+    setSelectedClient(null);
+    setSelectedFilial(null);
+    setAddress([]);
+    setQuantityProd(0);
+    setOrderNumber(null);
+    setDelNarx(undefined);
+    setSelectedTolovTuri("");
+    setTotalProductP(null);
+    setSelectedFilialId(null);
+    setSelectedOperator(null);
   };
 
   const onClose = () => {
     setOpen(false);
-  };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const responseB = await axios.get(
-        "https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma"
-      );
-      const responseT = await axios.get(
-        "https://10d4bfbc5e3cc2dc.mokky.dev/paymentMethod"
-      );
-      const responseCat = await axios.get(
-        "https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"
-      );
-      const responseProducts = await axios.get(
-        "https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"
-      );
-      const responseMijoz = await axios.get(
-        "https://10d4bfbc5e3cc2dc.mokky.dev/mijoz"
-      );
-      const responseF = await axios.get(
-        "https://3c2999041095f9d9.mokky.dev/filial"
-      );
-      const responseH = await axios.get(
-        "https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar"
-      );
-      const responseDelivery = await axios.get(
-        "https://3c2999041095f9d9.mokky.dev/delivery"
-      );
+    setAddProdList([]);
+    setSelectedClient(null);
+    setSelectedFilial(null);
+    setAddress([]);
+    setQuantityProd(0);
+    setOrderNumber(null);
+    setDelNarx(undefined);
+    setSelectedTolovTuri("");
+    setTotalProductP(null);
+    setSelectedFilialId(null);
+    setSelectedOperator(null);
+  };
+  const fetchData = async () => {
+    setIsLoading(true);
+    setIsError(false);
+    try {
+      const [
+        responseB,
+        responseT,
+        responseCat,
+        responseProducts,
+        responseMijoz,
+        responseF,
+        responseH,
+        responseDelivery,
+      ] = await Promise.all([
+        axios.get("https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma"),
+        axios.get("https://10d4bfbc5e3cc2dc.mokky.dev/paymentMethod"),
+        axios.get("https://2f972b43e3dad83a.mokky.dev/kotegoriyalar"),
+        axios.get("https://c1f85b42bbd414e1.mokky.dev/Maxsulotlar"),
+        axios.get("https://10d4bfbc5e3cc2dc.mokky.dev/mijoz"),
+        axios.get("https://3c2999041095f9d9.mokky.dev/filial"),
+        axios.get("https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar"),
+        axios.get("https://3c2999041095f9d9.mokky.dev/delivery"),
+      ]);
       setProducts(responseProducts.data);
       setBuyurtma(responseB.data);
       setTolovTuri(responseT.data);
@@ -109,7 +133,14 @@ export const Buyurtmalar: React.FC = () => {
       setFilial(responseF.data);
       setHodim(responseH.data);
       setDelivery(responseDelivery.data);
-    };
+    } catch (error) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -227,15 +258,17 @@ export const Buyurtmalar: React.FC = () => {
 
   const decrementQuantity = (id: number) => {
     setAddProdList((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              quantity: p.quantity - 1,
-              price: (p.originalPrice || p.price) * (p.quantity - 1),
-            }
-          : p
-      )
+      prev
+        .map((p) =>
+          p.id === id
+            ? {
+                ...p,
+                quantity: p.quantity - 1,
+                price: (p.originalPrice || p.price) * (p.quantity - 1),
+              }
+            : p
+        )
+        .filter((p) => p.quantity > 0)
     );
   };
 
@@ -268,6 +301,7 @@ export const Buyurtmalar: React.FC = () => {
       const delivNarx = delNarx ? delNarx : 0;
       return total + priceNum;
     }, 0) + (delNarx || 0);
+
   const delListProd = () => {
     setAddProdList([]);
   };
@@ -294,7 +328,7 @@ export const Buyurtmalar: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!selectedClient || addProdList.length === 0 || !address) {
-      console.log("Please fill in all required fields.");
+      message.warning("Barcha kerakli maydonlarni toʻldiring.");
       return;
     }
 
@@ -314,6 +348,7 @@ export const Buyurtmalar: React.FC = () => {
       filial_id: selectedFilialId,
       mijoz_id: selectedClient.id,
       quantity: quantityProd,
+      ordersCount: addProdList.length,
     };
 
     try {
@@ -324,25 +359,39 @@ export const Buyurtmalar: React.FC = () => {
 
       const newOrderId = resp.data.id;
 
-      // orderData.order_id = newOrderId;
-      setOrderNumber(newOrderId);
-
+      // Update the order with the new ID
       await axios.patch(
         `https://10d4bfbc5e3cc2dc.mokky.dev/buyurtma/${newOrderId}`,
         { order_id: newOrderId }
       );
 
+      // Update state with new order
       setBuyurtma((prevOrders) => [...prevOrders, resp.data]);
 
+      // Reset state values after successful submission
       setAddProdList([]);
       setSelectedClient(null);
       setSelectedFilial(null);
       setAddress([]);
+      setQuantityProd(0);
+      setOrderNumber(null);
+      setDelNarx(undefined);
+      setSelectedTolovTuri("");
+      setTotalProductP(null);
+      setSelectedFilialId(null);
+      setSelectedOperator(null);
+
       setOpen(false);
+      form.resetFields();
     } catch (error) {
       console.log("Error submitting order:", error);
     }
   };
+  useEffect(() => {
+    if (open) {
+      form.resetFields();
+    }
+  }, [open]);
   const getFilial = (id: number) => {
     const fil = filial.find((f) => f.id === id);
     return fil ? fil.nameUz : "-";
@@ -395,6 +444,23 @@ export const Buyurtmalar: React.FC = () => {
     setOrderNumber(Math.max(...buyurtma.map((p) => p.id)));
   }, [buyurtma]);
   const openOrder = () => {};
+
+  const yangiLength = buyurtma.filter((item) => item.status === "yangi");
+  const qabulLength = buyurtma.filter((item) => item.status === "qabul");
+  const jonatilganLength = buyurtma.filter(
+    (item) => item.status === "jonatilgan"
+  );
+
+  const yopilganLength = buyurtma.filter((item) => item.status === "yopilgan");
+
+  const sumTotalStatus = (status: string) => {
+    const totalPrice = buyurtma
+      .filter((item) => item.status === status)
+      .reduce((total: number, item) => {
+        return total + Number(item.order_details.total_amount || 0);
+      }, 0);
+    return totalPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
   return (
     <div className="">
       <div className="flex bg-white items-center">
@@ -623,7 +689,7 @@ export const Buyurtmalar: React.FC = () => {
                   </div>
                 </div>
                 <Form onFinish={handleSubmit} layout="vertical">
-                  <Form.Item style={{ marginTop: 10 }}>
+                  <Form.Item required style={{ marginTop: 10 }}>
                     <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
                       Mijoz ismi
                     </Typography>
@@ -956,107 +1022,223 @@ export const Buyurtmalar: React.FC = () => {
         </div>
 
         {selectedView === "columns" && (
-          <div className="flex gap-4">
-            <div className="contLast">
-              <div className="titleOrder">
-                <Typography>Yangi</Typography>
+          <div className="flex gap-4 mt-4">
+            <div className="">
+              <div className="flex titleOrder my-4 items-center gap-3 px-[15px]">
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    color: "grey",
+                    fontWeight: 600,
+                  }}
+                >
+                  Yangi
+                </Typography>
+                <div className=" px-3 py-1 bg-white rounded-md">
+                  <Typography.Text>{yangiLength.length}</Typography.Text>
+                </div>
               </div>
-              {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
-                buyurtma
-                  .filter((f) => f.status === "yangi")
-                  .map((item) => (
-                    <div key={item.id}>
-                      <CardOrdered
-                        key={item.id}
-                        orderStatus={orderStatus}
-                        getFilial={getFilial}
-                        getOperatorForOrder={getOperatorForOrder}
-                        getPaymentMethod={getPaymentMethod}
-                        filteredOrders={[item]}
-                        getClient={getClient}
-                        PriceComponent={PriceComponent}
-                      />
-                    </div>
-                  ))
-              ) : (
-                <Typography>Yangi</Typography>
-              )}
+              <div className="px-4 py-2 my-2 bg-white rounded-md w-[235px] mx-[15px] flex justify-between items-center">
+                <span className="w-[14px] h-[14px] rounded-full bg-[#20d472]"></span>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontWeight: 600,
+                    fontSize: "18px",
+                  }}
+                >
+                  {sumTotalStatus("yangi")} UZS
+                </Typography>
+              </div>
+              <div className="contLast">
+                {buyurtma.filter((b) => b.status === "yangi").length > 0 ? (
+                  buyurtma
+                    .filter((f) => f.status === "yangi")
+                    .map((item) => (
+                      <div key={item.id}>
+                        <CardOrdered
+                          key={item.id}
+                          orderStatus={orderStatus}
+                          getFilial={getFilial}
+                          getOperatorForOrder={getOperatorForOrder}
+                          getPaymentMethod={getPaymentMethod}
+                          filteredOrders={[item]}
+                          getClient={getClient}
+                          PriceComponent={PriceComponent}
+                        />
+                      </div>
+                    ))
+                ) : (
+                  <div className="min-w-[245px]">
+                    <Typography style={{ color: "grey" }}>
+                      Mavjut emas
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="contLast">
-              <div className="titleOrder">
-                <Typography>Qabul</Typography>
+            <div className="">
+              <div className="flex titleOrder my-4 items-center gap-3">
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    color: "grey",
+                    fontWeight: 600,
+                  }}
+                >
+                  Qabul
+                </Typography>
+                <div className=" px-3 py-1 bg-white rounded-md">
+                  <Typography.Text>{qabulLength.length}</Typography.Text>
+                </div>
               </div>
-
-              {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
-                buyurtma
-                  .filter((f) => f.status === "qabul")
-                  .map((item) => (
-                    <div key={item.id}>
-                      <CardOrdered
-                        key={item.id}
-                        orderStatus={orderStatus}
-                        getFilial={getFilial}
-                        getOperatorForOrder={getOperatorForOrder}
-                        getPaymentMethod={getPaymentMethod}
-                        filteredOrders={[item]}
-                        getClient={getClient}
-                        PriceComponent={PriceComponent}
-                      />
-                    </div>
-                  ))
-              ) : (
-                <Typography>Qabul</Typography>
-              )}
+              <div className="px-4 py-2 my-2 bg-white rounded-md w-[235px]  mx-[15px]  flex justify-between items-center">
+                <span className="w-[14px] h-[14px] rounded-full bg-blue-500"></span>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontWeight: 600,
+                    fontSize: "18px",
+                  }}
+                >
+                  {sumTotalStatus("qabul")} UZS
+                </Typography>
+              </div>
+              <div className="contLast">
+                {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
+                  buyurtma
+                    .filter((f) => f.status === "qabul")
+                    .map((item) => (
+                      <div key={item.id}>
+                        <CardOrdered
+                          key={item.id}
+                          orderStatus={orderStatus}
+                          getFilial={getFilial}
+                          getOperatorForOrder={getOperatorForOrder}
+                          getPaymentMethod={getPaymentMethod}
+                          filteredOrders={[item]}
+                          getClient={getClient}
+                          PriceComponent={PriceComponent}
+                        />
+                      </div>
+                    ))
+                ) : (
+                  <div className="min-w-[245px]">
+                    <Typography style={{ color: "grey" }}>
+                      Mavjut emas
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="contLast">
-              <div className="titleOrder">
-                <Typography>Jonatilgan</Typography>
+            <div className="">
+              <div className="flex titleOrder my-4  mx-[15px] items-center gap-3 px-[15px]">
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    color: "grey",
+                    fontWeight: 600,
+                  }}
+                >
+                  Jonatilgan
+                </Typography>
+                <div className=" px-3 py-1 bg-white rounded-md">
+                  <Typography.Text>{jonatilganLength.length}</Typography.Text>
+                </div>
               </div>
-              {buyurtma.filter((b) => b.status === "jonatilgan").length > 0 ? (
-                buyurtma
-                  .filter((f) => f.status === "jonatilgan")
-                  .map((item) => (
-                    <div key={item.id}>
-                      <CardOrdered
-                        key={item.id}
-                        orderStatus={orderStatus}
-                        getFilial={getFilial}
-                        getOperatorForOrder={getOperatorForOrder}
-                        getPaymentMethod={getPaymentMethod}
-                        filteredOrders={[item]}
-                        getClient={getClient}
-                        PriceComponent={PriceComponent}
-                      />
-                    </div>
-                  ))
-              ) : (
-                <Typography>jonatilgan</Typography>
-              )}
+              <div className="px-4 py-2 my-2 bg-white rounded-md w-[235px] mx-[15px] flex justify-between items-center">
+                <span className="w-[14px] h-[14px] rounded-full bg-[#fcb600]"></span>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontWeight: 600,
+                    fontSize: "18px",
+                  }}
+                >
+                  {sumTotalStatus("jonatilgan")} UZS
+                </Typography>
+              </div>
+              <div className="contLast">
+                {buyurtma.filter((b) => b.status === "jonatilgan").length >
+                0 ? (
+                  buyurtma
+                    .filter((f) => f.status === "jonatilgan")
+                    .map((item) => (
+                      <div key={item.id}>
+                        <CardOrdered
+                          key={item.id}
+                          orderStatus={orderStatus}
+                          getFilial={getFilial}
+                          getOperatorForOrder={getOperatorForOrder}
+                          getPaymentMethod={getPaymentMethod}
+                          filteredOrders={[item]}
+                          getClient={getClient}
+                          PriceComponent={PriceComponent}
+                        />
+                      </div>
+                    ))
+                ) : (
+                  <div className="min-w-[245px]">
+                    <Typography style={{ color: "grey" }}>
+                      Mavjut emas
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="contLast">
-              <div className="titleOrder">
-                <Typography>Yopilgan</Typography>
+            <div className="">
+              <div className="flex titleOrder my-4 items-center gap-3 px-[15px]">
+                <Typography
+                  style={{
+                    fontSize: "16px",
+                    color: "grey",
+                    fontWeight: 600,
+                  }}
+                >
+                  Yopilgan
+                </Typography>
+                <div className=" px-3 py-1 bg-white rounded-md">
+                  <Typography.Text>{yopilganLength.length}</Typography.Text>
+                </div>
               </div>
-              {buyurtma.filter((b) => b.status === "yopilgan").length > 0 ? (
-                buyurtma
-                  .filter((f) => f.status === "yopilgan")
-                  .map((item) => (
-                    <div key={item.id}>
-                      <CardOrdered
-                        key={item.id}
-                        orderStatus={orderStatus}
-                        getFilial={getFilial}
-                        getOperatorForOrder={getOperatorForOrder}
-                        getPaymentMethod={getPaymentMethod}
-                        filteredOrders={[item]}
-                        getClient={getClient}
-                        PriceComponent={PriceComponent}
-                      />
-                    </div>
-                  ))
-              ) : (
-                <Typography>Yopilgan</Typography>
-              )}
+              <div className="px-4 py-2 my-2 bg-white rounded-md w-[235px]  mx-[15px] flex justify-between items-center">
+                <span className="w-[14px] h-[14px] rounded-full bg-red-500"></span>
+                <Typography
+                  style={{
+                    color: "#2D3A45",
+                    fontWeight: 600,
+                    fontSize: "18px",
+                  }}
+                >
+                  {sumTotalStatus("yopilgan")} UZS
+                </Typography>
+              </div>
+              <div className="contLast">
+                {buyurtma.filter((b) => b.status === "yopilgan").length > 0 ? (
+                  buyurtma
+                    .filter((f) => f.status === "yopilgan")
+                    .map((item) => (
+                      <div key={item.id}>
+                        <CardOrdered
+                          key={item.id}
+                          orderStatus={orderStatus}
+                          getFilial={getFilial}
+                          getOperatorForOrder={getOperatorForOrder}
+                          getPaymentMethod={getPaymentMethod}
+                          filteredOrders={[item]}
+                          getClient={getClient}
+                          PriceComponent={PriceComponent}
+                        />
+                      </div>
+                    ))
+                ) : (
+                  <div className="min-w-[245px]">
+                    <Typography style={{ color: "grey" }}>
+                      Mavjut emas
+                    </Typography>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

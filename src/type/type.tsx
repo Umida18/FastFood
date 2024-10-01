@@ -14,6 +14,7 @@ export interface Order {
   status: string;
   order_details: Payment;
   mijoz_id: number;
+  ordersCount: number;
 }
 export interface PaymentM {
   id: number;
@@ -99,7 +100,7 @@ export interface Filial {
   nameRu: string;
   location: string;
   geometry: Geom;
-  operator: string;
+  operatorId: number;
   telefon: string;
   hours: string;
 }
