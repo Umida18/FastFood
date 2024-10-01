@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Branch } from "../../pages/filiallar/filiallar";
+import { Branch } from "../../type/type";
 
 const xaritaSlice = createSlice({
   name: "xarita",

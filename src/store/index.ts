@@ -1,15 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "./slices/counterSlice";
 import xaritaReducer from "./slices/xaritaSlice";
 import yetkazishNSlice from "./slices/yetkazishNSlice";
 import categorySlice from "./slices/kategoriya";
 
 const store = configureStore({
   reducer: {
-    counter: counterReducer,
     xarita: xaritaReducer,
     yetkazishNarxi: yetkazishNSlice,
-    categories:categorySlice
+    categories: categorySlice,
   },
 });
 

@@ -22,22 +22,7 @@ import { CiFilter } from "react-icons/ci";
 import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 import { Addres, Branch } from "../../type/type";
 
-// export interface Branch {
-//   id: number;
-//   nameUz: string;
-//   nameRu: string;
-//   location: string;
-//   operatorId: number;
-//   hours: string;
-//   geometry: [number, number];
-// }
-
-// interface Addres {
-//   L1: number | string;
-//   L2: number | string;
-// }
-
-const BranchTable = () => {
+const FilialTable = () => {
   const [data, setData] = useState<Branch[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isDrawerVisible, setIsDrawerVisible] = useState<boolean>(false);
@@ -156,7 +141,7 @@ const BranchTable = () => {
         }}
       >
         <div
-          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px]  justify-center gap-3"
+          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px]  justify-center gap-3  pt-[10px]"
           onClick={() => setIsDrawerVisible(true)}
         >
           <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center">
@@ -264,14 +249,14 @@ const BranchTable = () => {
 
       <Drawer
         title="Filial Manzili"
-        visible={mapVisible}
+        open={mapVisible}
         onClose={closeMap}
         width={600}
       >
         <YMaps>
           <Map
             defaultState={{
-              center: mapCoords || [41.327169, 69.282666],
+              center: [41.327169, 69.282666],
               zoom: 13,
             }}
             width="100%"
@@ -285,4 +270,4 @@ const BranchTable = () => {
   );
 };
 
-export default BranchTable;
+export default FilialTable;

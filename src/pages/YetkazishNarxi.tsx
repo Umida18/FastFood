@@ -13,16 +13,23 @@ import axios from "axios";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa6";
-import { Branch } from "./filiallar/filiallar";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store";
 import { setYetkazishNarxi } from "../store/slices/yetkazishNSlice";
+import { Branch } from "../type/type";
+
 export interface Narx {
   id: number;
   filialId: number;
   narxi: number;
   minimalNarx: string;
 }
+type Nar = {
+  id: number;
+  filialId: number;
+  narxi: number;
+  minimalNarx: string;
+};
 
 export const YetkazishNarxi = () => {
   const [filial, setFilial] = useState<Branch[]>([]);
@@ -34,6 +41,7 @@ export const YetkazishNarxi = () => {
     (state: RootState) => state.yetkazishNarxi.yetkazishNarxi
   );
   const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchData = async () => {
       try {

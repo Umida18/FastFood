@@ -81,14 +81,6 @@ export interface Delivey {
 export interface SelecCat {
   [key: string]: string[];
 }
-export interface Client {
-  key: string;
-  name: string;
-  phone: string;
-  orderCount: number;
-  status: "Aktiv" | "Block";
-}
-
 export interface Geom {
   0: number;
   1: number;
