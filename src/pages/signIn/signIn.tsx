@@ -12,6 +12,7 @@ import {
 import img1 from "../../img/signIn.png";
 import { useNavigate } from "react-router";
 import "./signIn.css";
+import { Link } from "react-router-dom";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -145,6 +146,8 @@ const SignIn = () => {
               />
             </Form.Item>
           </Form>
+          {/* <Link to={`/buyurtmalar`}>
+            {" "} */}
           <Button
             style={{
               backgroundColor: "#2D3A45",
@@ -156,6 +159,7 @@ const SignIn = () => {
           >
             Tizimga kirish
           </Button>
+          {/* </Link> */}
         </Col>
       </Row>
     </div>

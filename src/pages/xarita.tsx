@@ -4,7 +4,8 @@ import axios from "axios";
 import { setXarita } from "../store/slices/xaritaSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store";
-import { Filial, Hodimlarr } from "../type/type";
+import { Hodimlar } from "./hodimlar";
+import { Branch, Hodimlarr } from "../type/type";
 export const Xarita = () => {
   const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
 
@@ -53,7 +54,6 @@ export const Xarita = () => {
       ></div>
       <YMaps
         query={{
-          // ns: "use-load-option",
           load: "Map,Placemark,control.ZoomControl,geoObject.addon.balloon",
         }}
       >
@@ -62,8 +62,7 @@ export const Xarita = () => {
           className="w-[1250px] h-[650px] m-10 border-solid border-8 border-white mb-10"
         >
           <ZoomControl options={{ position: { right: 15, top: 15 } }} />
-          {/* <TypeSelector options={{ float: "left" }} /> */}{" "}
-          {xarita.map((item: Filial) => {
+          {xarita.map((item: Branch) => {
             return (
               <Placemark
                 geometry={item.geometry}

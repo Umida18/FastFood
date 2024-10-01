@@ -197,6 +197,7 @@ export const Mijozlar = () => {
           >
             <FaPlus style={{ color: "white", fontSize: "17px" }} />
           </div>
+
           <Typography
             style={{
               width: "100px",
@@ -208,7 +209,7 @@ export const Mijozlar = () => {
               alignItems: "center",
             }}
           >
-            Yangi mijoz qo'shish
+            Yangi Mijoz qo'shish
           </Typography>
         </div>
         <div className="w-[530px] flex justify-center items-center gap-5">
