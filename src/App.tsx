@@ -35,6 +35,7 @@ function App() {
               </Layout>
             }
           >
+            <Route path="/" element={<Navigate to={"./buyurtmalar"} />}></Route>
             <Route path="/buyurtmalar" element={<Buyurtmalar />}></Route>
             <Route path="/maxsulotlar" element={<Maxsulotlar />}></Route>
             <Route path="/kategoriyalar" element={<Kategoriyalar />}></Route>
@@ -45,7 +46,6 @@ function App() {
             <Route path="/yetkazishNarxi" element={<YetkazishNarxi />}></Route>
             <Route path="/xarita" element={<Xarita />}></Route>
           </Route>
-          <Route path="*" element={<Navigate to={"./buyurtmalar"} />}></Route>
           <Route path="/chiqish" element={<SignIn />}></Route>
         </Routes>
       </BrowserRouter>
