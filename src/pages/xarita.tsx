@@ -54,7 +54,7 @@ export const Xarita = () => {
       ></div>
       <YMaps
         query={{
-          load: "Map,Placemark,control.ZoomControl",
+          load: "Map,Placemark,control.ZoomControl,geoObject.addon.balloon",
         }}
       >
         <Map
@@ -68,10 +68,15 @@ export const Xarita = () => {
                 key={item.id}
                 geometry={item.geometry}
                 properties={{
-                  balloonContentHeader: `Operator:${operator(item.operatorId)}`,
+                  balloonContentHeader: `Operator: ${operator(
+                    item.operatorId
+                  )}`,
                   balloonContentBody: `Telefon: ${operatornumber(
                     item.operatorId
                   )}`,
+                }}
+                options={{
+                  balloonPanelMaxMapArea: 0, // Открывать балун при клике
                 }}
               />
             );
