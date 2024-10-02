@@ -71,9 +71,6 @@ export const Buyurtmalar: React.FC = () => {
   const [isError, setIsError] = useState<boolean>(false);
   const [form] = Form.useForm();
   const showDrawer = () => {
-    setOpen(true);
-    form.resetFields();
-
     setAddProdList([]);
     setSelectedClient(null);
     setSelectedFilial(null);
@@ -85,11 +82,13 @@ export const Buyurtmalar: React.FC = () => {
     setTotalProductP(null);
     setSelectedFilialId(null);
     setSelectedOperator(null);
+
+    setOpen(true);
+    form.resetFields();
   };
 
   const onClose = () => {
     setOpen(false);
-
     setAddProdList([]);
     setSelectedClient(null);
     setSelectedFilial(null);
@@ -669,7 +668,7 @@ export const Buyurtmalar: React.FC = () => {
                   {/* order list */}
                   <div className="orderList">
                     {addProdList.map((item, index) => (
-                      <div key={index} className="flex justify-between">
+                      <div key={item.id} className="flex justify-between">
                         <div>
                           <p>{item.name}</p>
                         </div>
@@ -688,7 +687,7 @@ export const Buyurtmalar: React.FC = () => {
                     </Typography>
                   </div>
                 </div>
-                <Form onFinish={handleSubmit} layout="vertical">
+                <Form onFinish={handleSubmit} layout="vertical" form={form}>
                   <Form.Item required style={{ marginTop: 10 }}>
                     <Typography style={{ color: "#8c8c8c", marginBottom: 5 }}>
                       Mijoz ismi
@@ -789,7 +788,7 @@ export const Buyurtmalar: React.FC = () => {
                       >
                         {address.map((item: any, index: any) => (
                           <Placemark
-                            key={index}
+                            key={item.id}
                             geometry={[item.L1, item.L2]}
                           />
                         ))}
@@ -816,7 +815,7 @@ export const Buyurtmalar: React.FC = () => {
           {filteredOrders.map((order) => {
             const client = getClient(order.mijoz_id);
             return (
-              <div>
+              <div key={order.id}>
                 {selectedView === "rows" && (
                   <div>
                     <div

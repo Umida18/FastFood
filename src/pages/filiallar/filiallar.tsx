@@ -218,7 +218,7 @@ export const Filiallar = () => {
                 value={categoryProd}
                 onChange={(value) => setCategoryProd(value)}
               >
-                {filial.map((item, index) => (
+                {filial.map((item) => (
                   <Option key={item.id} value={item.id}>
                     {item.nameUz}
                   </Option>
@@ -257,7 +257,7 @@ export const Filiallar = () => {
                 alignItems: "center",
               }}
             >
-              Maxsulot
+              FILIAL NOMI(UZ)
             </Typography>
           </div>
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
@@ -272,7 +272,7 @@ export const Filiallar = () => {
                 alignItems: "center",
               }}
             >
-              Kategoriya
+              FILIAL NOMI(RU)
             </Typography>
           </div>
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
@@ -287,9 +287,9 @@ export const Filiallar = () => {
                 alignItems: "center",
               }}
             >
-              Narxi
+              MO'LJAL
             </Typography>
-          </div>
+          </div>{" "}
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
             <Typography
               style={{
@@ -302,7 +302,7 @@ export const Filiallar = () => {
                 alignItems: "center",
               }}
             >
-              Qo’shimcha
+              ISH VAQTI
             </Typography>
           </div>
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
@@ -326,7 +326,10 @@ export const Filiallar = () => {
         <div>
           <div className="px-6 flex flex-col gap-3 contMain">
             {filteredProducts.map((item) => (
-              <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
+              <div
+                key={item.id}
+                className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
+              >
                 <div className="flex w-[290px]">
                   <Typography
                     style={{
@@ -339,15 +342,45 @@ export const Filiallar = () => {
                   >
                     {item.nameUz}
                   </Typography>
-                </div>
-                {/* <div className="w-[290px] text-[#2D3A45] text-[15px] flex items-center">
-                  {CategName(item.type)}
-                </div> */}
-                {/* <div className="w-[250px] text-[#2D3A45] text-[15px] flex items-center">
-                  <PriceComponent price={item.location} />
-                </div> */}
-                <div className="w-[300px] text-[#2D3A45] text-[15px] flex items-center">
-                  {item.telefon}
+                </div>{" "}
+                <div className="flex w-[290px]">
+                  <Typography
+                    style={{
+                      marginLeft: "20px",
+                      fontSize: "15px",
+                      color: "#2D3A45",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {item.nameRu}
+                  </Typography>
+                </div>{" "}
+                <div className="flex w-[290px]">
+                  <Typography
+                    style={{
+                      marginLeft: "20px",
+                      fontSize: "15px",
+                      color: "#2D3A45",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {item.location}
+                  </Typography>
+                </div>{" "}
+                <div className="flex w-[290px]">
+                  <Typography
+                    style={{
+                      marginLeft: "20px",
+                      fontSize: "15px",
+                      color: "#2D3A45",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    {item.hours}
+                  </Typography>
                 </div>
                 <div className="flex gap-4">
                   <div

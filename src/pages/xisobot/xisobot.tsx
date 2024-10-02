@@ -361,7 +361,7 @@ const Xisobot = () => {
 
   const { RangePicker } = DatePicker;
 
-  console.log("form", form.getFieldValue(DatePicker));
+  // console.log("form", form.getFieldValue(DatePicker));
 
   const a = buyurtmalar
     .filter(

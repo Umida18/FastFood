@@ -90,12 +90,10 @@ export const Mijozlar = () => {
   const menuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
   const countorderNumber = (id: number) => {
     const findmijoz = buyurtma.filter((item) => item.mijoz_id === id);
-    const countM = findmijoz.reduce((total: number, count: Order) => {
-      return total + (count.ordersCount || 0);
-    }, 0);
-    return countM;
+    return findmijoz.length;
   };
   const addEditMijoz = async (values: {
     firstName: string;
@@ -363,7 +361,10 @@ export const Mijozlar = () => {
 
         <div className="px-6 flex flex-col gap-3 contMain">
           {filteredMijozlar.map((mijoz) => (
-            <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
+            <div
+              key={mijoz.id}
+              className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
+            >
               <div className="flex w-[275px]">
                 <Typography
                   style={{

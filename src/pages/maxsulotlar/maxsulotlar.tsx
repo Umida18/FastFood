@@ -474,7 +474,10 @@ export const Maxsulotlar = () => {
         <div>
           <div className="px-6 flex flex-col gap-3 contMain">
             {filteredProducts.map((item) => (
-              <div className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg">
+              <div
+                key={item.id}
+                className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
+              >
                 <div className="flex w-[290px]">
                   <img
                     className="h-[40px] w-[40px] rounded-full"

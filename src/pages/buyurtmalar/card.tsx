@@ -66,11 +66,8 @@ const CardOrdered: React.FC<ICardProps> = ({
       {filteredOrders.map((order: Order) => {
         const client = getClient(order.mijoz_id);
         return (
-          <div>
-            <div
-              key={order.id}
-              className="flex flex-col bg-white mb-6 w-[234px] h-[345px] px-4 py-2 rounded-md shadow-lg"
-            >
+          <div key={order.id}>
+            <div className="flex flex-col bg-white mb-6 w-[234px] h-[345px] px-4 py-2 rounded-md shadow-lg">
               <div className="flex flex-row justify-between gap-4 py-3 items-center ">
                 <div className="flex justify-center items-center content-center">
                   {/* <div className="flex justify-center items-center content-center"> */}

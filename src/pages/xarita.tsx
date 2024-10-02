@@ -8,9 +8,9 @@ import { Hodimlar } from "./hodimlar";
 import { Branch, Hodimlarr } from "../type/type";
 export const Xarita = () => {
   const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
-
   const xarita = useSelector((state: RootState) => state.xarita.xarita);
   const dispatch = useDispatch();
+
   useEffect(() => {
     const initialData = async () => {
       try {
@@ -54,7 +54,7 @@ export const Xarita = () => {
       ></div>
       <YMaps
         query={{
-          load: "Map,Placemark,control.ZoomControl,geoObject.addon.balloon",
+          load: "Map,Placemark,control.ZoomControl",
         }}
       >
         <Map
@@ -65,6 +65,7 @@ export const Xarita = () => {
           {xarita.map((item: Branch) => {
             return (
               <Placemark
+                key={item.id}
                 geometry={item.geometry}
                 properties={{
                   balloonContentHeader: `Operator:${operator(item.operatorId)}`,

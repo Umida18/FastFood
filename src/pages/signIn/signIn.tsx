@@ -38,6 +38,7 @@ const SignIn = () => {
       const data = await response.json();
       if (response.ok) {
         message.success("Muvaffaqiyatli tizimga kirildi");
+        navigate("/buyurtmalar");
       } else {
         message.error(data.message || "Tizimga kirish muvaffaqiyatsiz bo'ldi");
       }
@@ -55,10 +56,15 @@ const SignIn = () => {
   };
 
   return (
-    <div>
+    <div className="!h-[100vh] p-0">
       <Row>
-        <Col span={13} style={{ objectFit: "cover" }}>
-          <img src={img1} alt="Sign In" />
+        <Col span={13} className="w-full">
+          <img
+            src={img1}
+            alt="Sign In"
+            className="w-full"
+            style={{ objectFit: "cover", height: "100vh" }}
+          />
         </Col>
         <Col
           span={11}
@@ -117,7 +123,7 @@ const SignIn = () => {
             >
               <Input
                 type="email"
-                placeholder="Email"
+                placeholder="fastfood@gmail.com"
                 style={{ border: "0px" }}
                 onFocus={() => handleActiveInp("email")}
                 value={email}
@@ -133,11 +139,16 @@ const SignIn = () => {
                 { required: true, message: "Please input your email!" },
               ]}
               className={activeInput === "password" ? "selectedInput" : ""}
-              style={{ height: "70px", display: "flex", alignItems: "center" }}
+              style={{
+                height: "60px",
+                display: "flex",
+                alignItems: "center",
+                padding: "10px",
+              }}
             >
               <Input
                 type="password"
-                placeholder="Parol"
+                placeholder="123"
                 style={{ border: "0px", outline: "none", marginBottom: "0px" }}
                 onFocus={() => handleActiveInp("password")}
                 value={password}

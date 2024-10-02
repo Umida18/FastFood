@@ -19,7 +19,7 @@ const { Header, Content, Footer, Sider } = AntLayout;
 
 const items = [
   {
-    key: "Buyurtmalar",
+    key: "buyurtmalar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <FaRegCircleCheck className="text-gray-600" />
@@ -28,7 +28,7 @@ const items = [
     label: <Link to="/buyurtmalar">Buyurtmalar</Link>,
   },
   {
-    key: "Maxsulotlar",
+    key: "maxsulotlar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <HiOutlineArchiveBox className="text-gray-600" />
@@ -37,7 +37,7 @@ const items = [
     label: <Link to="/maxsulotlar">Maxsulotlar</Link>,
   },
   {
-    key: "Kategoriyalar",
+    key: "kategoriyalar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <VscChecklist className="text-gray-600" />
@@ -46,7 +46,7 @@ const items = [
     label: <Link to="/kategoriyalar">Kategoriyalar</Link>,
   },
   {
-    key: "Filiallar",
+    key: "filiallar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <IoLocationOutline className="text-gray-600" />
@@ -55,7 +55,7 @@ const items = [
     label: <Link to="/filiallar">Filiallar</Link>,
   },
   {
-    key: "Mijozlar",
+    key: "mijozlar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <MdOutlinePeopleAlt className="text-gray-600" />
@@ -64,7 +64,7 @@ const items = [
     label: <Link to="/mijozlar">Mijozlar</Link>,
   },
   {
-    key: "Xisobot",
+    key: "xisobot",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <LuBarChart2 className="text-gray-600" />
@@ -73,7 +73,7 @@ const items = [
     label: <Link to="/xisobot">Xisobot</Link>,
   },
   {
-    key: "Hodimlar",
+    key: "hodimlar",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <FaPeopleGroup className="text-gray-600" />
@@ -83,7 +83,7 @@ const items = [
   },
 
   {
-    key: "YetkazishNarxi",
+    key: "yetkazishNarxi",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <HiOutlineArchiveBox className="text-gray-600" />
@@ -93,7 +93,7 @@ const items = [
   },
 
   {
-    key: "Xarita",
+    key: "xarita",
     icon: (
       <div className="bg-gray-100 rounded p-2">
         <TfiLocationPin className="text-gray-600" />
@@ -110,12 +110,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const [selectedKey, setSelectedKey] = useState([""]);
   const [openKeys, setOpenKeys] = useState([""]);
-  const location = useLocation();
-  console.log(location);
 
   useEffect(() => {
     setSelectedKey([location.pathname.slice(1)]);
   }, []);
+  const location = useLocation();
+  const path = location.pathname.split("/")[1];
+  console.log("path", path);
 
   return (
     <AntLayout>
@@ -155,14 +156,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <Menu
             theme="light"
             mode="inline"
-            selectedKeys={selectedKey}
-            onSelect={({ selectedKeys }) => {
-              setSelectedKey(selectedKeys);
-            }}
-            openKeys={openKeys}
-            onOpenChange={(keys) => {
-              setOpenKeys(keys);
-            }}
+            selectedKeys={[path]}
+            // selectedKeys={selectedKey}
+            // onSelect={({ selectedKeys }) => {
+            //   setSelectedKey(selectedKeys);
+            // }}
+            // openKeys={openKeys}
+            // onOpenChange={(keys) => {
+            //   setOpenKeys(keys);
+            // }}
             items={items}
           />
 
