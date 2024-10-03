@@ -270,13 +270,6 @@ export const Buyurtmalar: React.FC = () => {
     setTotalProductP(orderPrice);
   }, [addProdList]);
 
-  const totalPrice =
-    addProdList.reduce((total, prod) => {
-      const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
-      const delivNarx = delNarx ? delNarx : 0;
-      return total + priceNum;
-    }, 0) + (delNarx || 0);
-
   const delListProd = () => {
     setAddProdList([]);
   };
@@ -301,6 +294,13 @@ export const Buyurtmalar: React.FC = () => {
     console.log(address);
   };
 
+  const totalPrice =
+    addProdList.reduce((total, prod) => {
+      const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
+      const delivNarx = delNarx ? delNarx : 0;
+      return total + priceNum;
+    }, 0) + (delNarx || 0);
+
   const handleFinish = async (values: {
     mijoz_id: number;
     filial_id: number;
@@ -317,6 +317,19 @@ export const Buyurtmalar: React.FC = () => {
 
     setSelectedClient(selectedClient || null);
     setSelectedOperator(selectedOperator || null);
+    const delivPrice =
+      delivery
+        .filter((item) => item.filialId === selectedFilial?.id)
+        .map((item) => item.narxi)[0] || 0;
+
+    const totalPrice =
+      addProdList.reduce((total, prod) => {
+        const priceNum = parseFloat(prod.price.toString().replace(/,/g, ""));
+
+        const delivNarx = delNarx ? delNarx : 0;
+        return total + priceNum;
+      }, 0) + delivPrice;
+
     if (!selectedClient || addProdList.length === 0 || !address) {
       message.warning("Barcha kerakli maydonlarni toʻldiring.");
       return;

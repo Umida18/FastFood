@@ -466,17 +466,17 @@ const Xisobot = () => {
   return (
     <div className="bg-[#edeff3]">
       <div
-        className=" bg-white"
+        className=" bg-white h-[78px]"
         style={{
           display: "flex",
           justifyContent: "start",
-          gap: 3,
+          gap: 18,
           margin: "0",
           padding: "0",
         }}
       >
         <div
-          className="flex border-x-4 border-x-[#edeff3] w-[205px] h-[60px] p-3 items-center justify-center gap-3 "
+          className="flex border-x-4 cursor-pointer border-x-[#edeff3] w-[205px] h-[78px] p-3 items-center justify-center gap-3 "
           onClick={() => refreshPage()}
         >
           <div className="w-[35px] h-[35px] rounded-full bg-[#20D472] flex items-center justify-center ">
@@ -497,17 +497,16 @@ const Xisobot = () => {
           style={{
             display: "flex",
             justifyContent: "start",
-            gap: 3,
+            gap: 30,
+            alignItems: "center",
           }}
         >
-          {" "}
-          <div className="w-[300px] h-[48px]  py-3 px-6 items-center">
-            <Input
-              // prefix={<SearchOutlined />}
+          <div className="w-[300px] border-[0px] h-[48px] px-3  items-center">
+            <input
               placeholder="Qidirish"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="rounded-[35px] bg-[#edeff3]"
+              className="rounded-[35px] px-3 h-[48px] bg-[#edeff3] w-[300px] border-[0px]"
             />
           </div>
           <div className="bg-[#edeff3] rounded-[30px] flex justify-center gap-1 items-center w-[97px] h-[48px]">
