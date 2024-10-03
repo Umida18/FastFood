@@ -20,33 +20,62 @@ import { Xarita } from "./pages/xarita";
 import Xisobot from "./pages/xisobot/xisobot";
 import { Provider } from "react-redux";
 import store from "./store";
+import { useState } from "react";
+
+interface ProtectedRouteProps {
+  isAuthenticated: boolean;
+  children: JSX.Element;
+}
+
+// Protected route to restrict access unless logged in
+const ProtectedRoute = ({ isAuthenticated, children }: ProtectedRouteProps) => {
+  if (!isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+  return children;
+};
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
     <Provider store={store}>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<SignIn />}></Route>
+          {/* Public SignIn Route */}
           <Route
             path="/"
+            element={<SignIn setIsAuthenticated={setIsAuthenticated} />}
+          />
+
+          {/* Layout Routes */}
+          <Route
+            path="/layout"
             element={
-              <Layout>
-                <Outlet />
-              </Layout>
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Layout>
+                  <Outlet />
+                </Layout>
+              </ProtectedRoute>
             }
           >
-            <Route path="/" element={<Navigate to={"./buyurtmalar"} />}></Route>
-            <Route path="/buyurtmalar" element={<Buyurtmalar />}></Route>
-            <Route path="/maxsulotlar" element={<Maxsulotlar />}></Route>
-            <Route path="/kategoriyalar" element={<Kategoriyalar />}></Route>
-            <Route path="/filiallar" element={<Filiallar />}></Route>
-            <Route path="/mijozlar" element={<Mijozlar />}></Route>
-            <Route path="/xisobot" element={<Xisobot />}></Route>
-            <Route path="/hodimlar" element={<Hodimlar />}></Route>
-            <Route path="/yetkazishNarxi" element={<YetkazishNarxi />}></Route>
-            <Route path="/xarita" element={<Xarita />}></Route>
+            {/* Nested Routes within /layout */}
+            <Route path="buyurtmalar" element={<Buyurtmalar />} />
+            <Route path="maxsulotlar" element={<Maxsulotlar />} />
+            <Route path="kategoriyalar" element={<Kategoriyalar />} />
+            <Route path="filiallar" element={<Filiallar />} />
+            <Route path="mijozlar" element={<Mijozlar />} />
+            <Route path="xisobot" element={<Xisobot />} />
+            <Route path="hodimlar" element={<Hodimlar />} />
+            <Route path="yetkazishNarxi" element={<YetkazishNarxi />} />
+            <Route path="xarita" element={<Xarita />} />
           </Route>
-          <Route path="/chiqish" element={<SignIn />}></Route>
+
+          {/* Redirect to SignIn */}
+          <Route
+            path="/chiqish"
+            element={<SignIn setIsAuthenticated={setIsAuthenticated} />}
+          />
         </Routes>
       </BrowserRouter>
     </Provider>

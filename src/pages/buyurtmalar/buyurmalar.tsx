@@ -9,6 +9,7 @@ import {
   Select,
   Form,
   message,
+  Spin,
 } from "antd";
 import { FaPlus, FaRegUser } from "react-icons/fa6";
 import { IoCheckmark, IoClipboardOutline } from "react-icons/io5";
@@ -47,7 +48,6 @@ export const Buyurtmalar: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [mijoz, setMijoz] = useState<Mijoz[]>([]);
   const [activeTab, setActiveTab] = useState<string>("yangi");
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedView, setSelectedView] = useState<string>("columns");
   const [openSelMijoz, setOpenSelMijoz] = useState<boolean>(false);
   const [addProdList, setAddProdList] = useState<Product[]>([]);
@@ -61,48 +61,21 @@ export const Buyurtmalar: React.FC = () => {
   );
   const [delivery, setDelivery] = useState<Delivey[]>([]);
   const [delNarx, setDelNarx] = useState<number | undefined>(undefined);
-  const [isProductAdded, setIsProductAdded] = useState<boolean>(false);
   const [selectedFilialId, setSelectedFilialId] = useState<number | null>(null);
-  const [selectedTolovTuri, setSelectedTolovTuri] = useState<string>("");
   const [quantityProd, setQuantityProd] = useState<number | null>(null);
   const [totalProductP, setTotalProductP] = useState<number | null>(null);
   const [orderNumber, setOrderNumber] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
-  // const [selectedClient, setSelectedClient] = useState<any>(null);
-  // const [selectedOperator, setSelectedOperator] = useState<any>(null);
 
   const [form] = Form.useForm();
   const showDrawer = () => {
-    // setAddProdList([]);
-    // setSelectedClient(null);
-    // setSelectedFilial(null);
-    // setAddress([]);
-    // setQuantityProd(0);
-    // setOrderNumber(null);
-    // setDelNarx(undefined);
-    // setSelectedTolovTuri("");
-    // setTotalProductP(null);
-    // setSelectedFilialId(null);
-    // setSelectedOperator(null);
-
     setOpen(true);
     form.resetFields();
   };
 
   const onClose = () => {
     setOpen(false);
-    // setAddProdList([]);
-    // setSelectedClient(null);
-    // setSelectedFilial(null);
-    // setAddress([]);
-    // setQuantityProd(0);
-    // setOrderNumber(null);
-    // setDelNarx(undefined);
-    // setSelectedTolovTuri("");
-    // setTotalProductP(null);
-    // setSelectedFilialId(null);
-    // setSelectedOperator(null);
   };
   const fetchData = async () => {
     setIsLoading(true);
@@ -813,7 +786,15 @@ export const Buyurtmalar: React.FC = () => {
                   </Form.Item>
 
                   <Form.Item style={{ marginTop: 15 }}>
-                    <Button type="primary" htmlType="submit">
+                    <Button
+                      htmlType="submit"
+                      style={{
+                        backgroundColor: "#20D472",
+                        border: "none",
+                        marginTop: "20px",
+                        color: "white",
+                      }}
+                    >
                       Saqlash
                     </Button>
                   </Form.Item>
@@ -1122,22 +1103,26 @@ export const Buyurtmalar: React.FC = () => {
               </div>
               <div className="contLast">
                 {buyurtma.filter((b) => b.status === "qabul").length > 0 ? (
-                  buyurtma
-                    .filter((f) => f.status === "qabul")
-                    .map((item) => (
-                      <div key={item.id}>
-                        <CardOrdered
-                          key={item.id}
-                          orderStatus={orderStatus}
-                          getFilial={getFilial}
-                          getOperatorForOrder={getOperatorForOrder}
-                          getPaymentMethod={getPaymentMethod}
-                          filteredOrders={[item]}
-                          getClient={getClient}
-                          PriceComponent={PriceComponent}
-                        />
-                      </div>
-                    ))
+                  isLoading ? (
+                    <Spin />
+                  ) : (
+                    buyurtma
+                      .filter((f) => f.status === "qabul")
+                      .map((item) => (
+                        <div key={item.id}>
+                          <CardOrdered
+                            key={item.id}
+                            orderStatus={orderStatus}
+                            getFilial={getFilial}
+                            getOperatorForOrder={getOperatorForOrder}
+                            getPaymentMethod={getPaymentMethod}
+                            filteredOrders={[item]}
+                            getClient={getClient}
+                            PriceComponent={PriceComponent}
+                          />
+                        </div>
+                      ))
+                  )
                 ) : (
                   <div className="min-w-[245px]">
                     <Typography style={{ color: "grey" }}>

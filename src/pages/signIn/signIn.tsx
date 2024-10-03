@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -12,35 +12,56 @@ import {
 import img1 from "../../img/signIn.png";
 import { useNavigate } from "react-router";
 import "./signIn.css";
-import { Link } from "react-router-dom";
+import axios from "axios";
 
-const SignIn = () => {
+interface IData {
+  email: string;
+  parol: number;
+}
+
+interface SignInProps {
+  setIsAuthenticated: (authenticated: boolean) => void;
+}
+
+const SignIn: React.FC<SignInProps> = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [activeInput, setActiveInput] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<IData[]>([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://544287c7d245201c.mokky.dev/SingIn"
+        );
+        setData(response.data);
+      } catch (error) {}
+    };
+    fetchData();
+  }, []);
+
   const handeSubmit = async () => {
+    if (!email || !password) {
+      message.error("Iltimos, email va parolni kiriting!");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://544287c7d245201c.mokky.dev/SingIn",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
+      const user = data.find(
+        (item) => item.email === email && item.parol.toString() === password
       );
-      const data = await response.json();
-      if (response.ok) {
+
+      if (user) {
         message.success("Muvaffaqiyatli tizimga kirildi");
-        navigate("/buyurtmalar");
+        setIsAuthenticated(true);
+        navigate("/layout/buyurtmalar");
       } else {
-        message.error(data.message || "Tizimga kirish muvaffaqiyatsiz bo'ldi");
+        message.error("Email yoki parol noto'g'ri");
       }
     } catch (error) {
       message.error("Tizimga kirishda xato yuz berdi");
@@ -48,9 +69,11 @@ const SignIn = () => {
       setLoading(false);
     }
   };
+
   const handleActiveInp = (item: string) => {
     setActiveInput(item);
   };
+
   const handleBlur = () => {
     setActiveInput(null);
   };
@@ -101,7 +124,6 @@ const SignIn = () => {
           </div>
           <Form
             style={{
-              // height: "141px",
               width: "300px",
               backgroundColor: "white",
               marginBlock: 20,
@@ -109,10 +131,6 @@ const SignIn = () => {
             }}
           >
             <Form.Item
-              rules={[
-                { type: "email", message: "The input is not a valid email" },
-                { required: true, message: "Please input your email!" },
-              ]}
               className={activeInput === "email" ? "selectedInput" : ""}
               style={{
                 height: "60px",
@@ -134,10 +152,6 @@ const SignIn = () => {
             </Form.Item>
             <Divider />
             <Form.Item
-              rules={[
-                { type: "email", message: "The input is not a valid email" },
-                { required: true, message: "Please input your email!" },
-              ]}
               className={activeInput === "password" ? "selectedInput" : ""}
               style={{
                 height: "60px",
@@ -157,8 +171,7 @@ const SignIn = () => {
               />
             </Form.Item>
           </Form>
-          {/* <Link to={`/buyurtmalar`}>
-            {" "} */}
+
           <Button
             style={{
               backgroundColor: "#2D3A45",
@@ -167,10 +180,10 @@ const SignIn = () => {
               color: "white",
             }}
             onClick={handeSubmit}
+            loading={loading}
           >
             Tizimga kirish
           </Button>
-          {/* </Link> */}
         </Col>
       </Row>
     </div>

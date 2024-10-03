@@ -22,7 +22,15 @@ import { FaPlus } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
 import { CiFilter } from "react-icons/ci";
 import { PlusOutlined } from "@ant-design/icons";
-import { Branch, Category, Product, SelecCat } from "../../type/type";
+import {
+  Branch,
+  Category,
+  Hodimlarr,
+  Product,
+  SelecCat,
+} from "../../type/type";
+import { FiMapPin } from "react-icons/fi";
+import { Map, Placemark, YMaps } from "@pbe/react-yandex-maps";
 
 const { Option } = Select;
 
@@ -38,36 +46,57 @@ export const Filiallar = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [editingProdId, setEditingProdId] = useState<number | null>(null);
+  const [mapCoords, setMapCoords] = useState<number[] | null>(null);
+  const [hodimlar, setHodimlar] = useState<Hodimlarr[]>([]);
   const [form] = Form.useForm();
   const [page, setPage] = useState(1);
+  const [mapMode, setMapMode] = useState(false);
 
-  const showDrawer = (product?: Branch) => {
-    if (product) {
-      setEditingProdId(product.id);
+  const showDrawer = (branch?: Branch, coords?: number[], mode?: string) => {
+    if (mode === "map") {
+      setMapMode(true); // Show only the map
+    } else {
+      setMapMode(false); // Show form with map
+    }
+
+    if (branch) {
+      setEditingProdId(branch.id);
       form.setFieldsValue({
-        name: product.nameUz,
-        // type: product.type,
-        price: product.location,
-        desc: product.telefon,
-        img: product.hours,
+        nameUz: branch.nameUz,
+        nameRu: branch.nameRu,
+        location: branch.location,
+        geometry: branch.geometry,
+        operatorId: branch.operatorId,
+        hours: branch.hours,
       });
+      setMapCoords(branch.geometry); // Set map coordinates
     } else {
       setEditingProdId(null);
       form.resetFields();
+      setMapCoords([41.327169, 69.282666]); // Default coordinates for adding
     }
+
     setOpen(true);
   };
-
+  const handleMapClick = (e: any) => {
+    const coords = e.get("coords");
+    setMapCoords(coords);
+    form.setFieldsValue({ geometry: coords });
+  };
   const onClose = () => {
     setOpen(false);
+    setMapCoords(null);
   };
-
   const fetchData = async (pageNumber: number) => {
     try {
       const responseCat = await axios.get(
         "https://3c2999041095f9d9.mokky.dev/filial"
       );
       setFilial(responseCat.data);
+      const responseHodim = await axios.get(
+        "https://10d4bfbc5e3cc2dc.mokky.dev/Hodimlar"
+      );
+      setHodimlar(responseHodim.data);
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -110,45 +139,44 @@ export const Filiallar = () => {
     }
   };
 
-  const addEditProd = async (values: {
-    name: string;
-    type: number;
-    price: string;
-    desc: string;
-    img: string;
+  const addEditFilial = async (values: {
+    nameUz: string;
+    nameRu: string;
+    location: string;
+    geometry: [number, number];
+    operatorId: number;
+    hours: string;
   }) => {
     try {
-      const productData = {
-        ...values,
-        price: parseFloat(values.price),
-        img: previewUrl || "",
-      };
       if (editingProdId === null) {
         const response = await axios.post(
           "https://3c2999041095f9d9.mokky.dev/filial",
-          productData
+          values
         );
         setFilial([...filial, response.data]);
-        message.success("Maxsulot muvaffaqiyatli qo'shildi!");
+        message.success("Yangi filial muvaffaqiyatli qo'shildi");
       } else {
         await axios.patch(
           `https://3c2999041095f9d9.mokky.dev/filial/${editingProdId}`,
-          productData
+          values
         );
         setFilial(
-          filial.map((prod) =>
-            prod.id === editingProdId ? { ...prod, ...productData } : prod
+          filial.map((branch) =>
+            branch.id === editingProdId ? { ...branch, ...values } : branch
           )
         );
-        message.success("Maxsulot muvaffaqiyatli yangilandi!");
+        message.success("Filial muvaffaqiyatli yangilandi");
       }
 
       onClose();
     } catch (error) {
-      message.error("Failed to add product. Please try again.");
-      console.error("Error adding product: ", error);
+      message.error(
+        "Amalni bajarishda xatolik yuz berdi. Iltimos, qayta urinib ko'ring."
+      );
+      console.error("Error adding/editing filial: ", error);
     }
   };
+
   const PriceComponent = ({ price }: { price: number }) => {
     const formatPrice = (price: number) => {
       return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -198,48 +226,94 @@ export const Filiallar = () => {
         </div>
         <Drawer
           title={
-            editingProdId ? "Maxsulotni Tahrirlash" : "Yangi maxsulot qo'shish"
+            mapMode
+              ? "Filial joylashuvi"
+              : editingProdId
+              ? "Filialni Tahrirlash"
+              : "Yangi filial qo'shish"
           }
           onClose={onClose}
           open={open}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          }}
         >
-          <Form form={form} layout="vertical" onFinish={addEditProd}>
-            <Form.Item name="name" label="Maxsulot nomi">
-              <Input />
-            </Form.Item>
-            <Form.Item name="type" label="Kategoriya">
-              <Select
-                style={{ width: 200 }}
-                value={categoryProd}
-                onChange={(value) => setCategoryProd(value)}
+          {mapMode ? (
+            <YMaps
+              query={{ load: "Map,Placemark,control.ZoomControl,geocode" }}
+            >
+              <Map
+                defaultState={{
+                  center: mapCoords || [41.327169, 69.282666],
+                  zoom: 13,
+                }}
+                style={{ width: "100%", height: "300px" }}
               >
-                {filial.map((item) => (
-                  <Option key={item.id} value={item.id}>
-                    {item.nameUz}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item name="price" label="Narxi">
-              <Input />
-            </Form.Item>
-            <Form.Item name="desc" label="Qo'shimcha ma'lumot">
-              <Input />
-            </Form.Item>
-            <div>
-              <Button
-                htmlType="submit"
-                style={{ backgroundColor: "#20D472", border: "none" }}
-              >
-                {editingProdId ? "Yangilash" : "Saqlash"}
-              </Button>
-            </div>
-          </Form>
+                {mapCoords && <Placemark geometry={mapCoords} />}
+              </Map>
+            </YMaps>
+          ) : (
+            // Full form with map
+            <Form form={form} layout="vertical" onFinish={addEditFilial}>
+              <Form.Item name="nameUz" label="Filial nomi (Uz)">
+                <Input />
+              </Form.Item>
+              <Form.Item name="nameRu" label="Filial nomi (Ru)">
+                <Input />
+              </Form.Item>
+              <Form.Item name="location" label="Manzil (Mo'ljal)">
+                <Input />
+              </Form.Item>
+
+              {/* Koordinatalar (Geometry) */}
+              <Form.Item name="geometry" label="Koordinatalar (geometriya)">
+                <Input
+                  style={{ marginBottom: 10 }}
+                  value={
+                    mapCoords ? `L1: ${mapCoords[0]}, L2: ${mapCoords[1]}` : ""
+                  }
+                  readOnly
+                />
+                {/* Map for selecting/editing coordinates */}
+                <YMaps
+                  query={{ load: "Map,Placemark,control.ZoomControl,geocode" }}
+                >
+                  <Map
+                    defaultState={{
+                      center: mapCoords || [41.327169, 69.282666],
+                      zoom: 13,
+                    }}
+                    onClick={handleMapClick}
+                    style={{ width: "100%", height: "300px" }}
+                  >
+                    {mapCoords && <Placemark geometry={mapCoords} />}
+                  </Map>
+                </YMaps>
+              </Form.Item>
+
+              <Form.Item name="operatorId" label="Operator">
+                <Select style={{ width: 200 }}>
+                  {hodimlar.map((operator) => (
+                    <Option key={operator.id} value={operator.id}>
+                      {operator.fistN} {operator.lastN} {operator.thName}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item name="hours" label="Ish vaqti">
+                <Input />
+              </Form.Item>
+              <div>
+                <Button
+                  htmlType="submit"
+                  style={{
+                    backgroundColor: "#20D472",
+                    border: "none",
+                    marginTop: "20px",
+                  }}
+                >
+                  {editingProdId ? "Yangilash" : "Saqlash"}
+                </Button>
+              </div>
+            </Form>
+          )}
         </Drawer>
       </div>
 
@@ -289,7 +363,7 @@ export const Filiallar = () => {
             >
               MO'LJAL
             </Typography>
-          </div>{" "}
+          </div>
           <div className=" border-l-2 border-[#edeff3] flex justify-center align-middle uppercase">
             <Typography
               style={{
@@ -315,7 +389,7 @@ export const Filiallar = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                marginRight: "55px",
+                marginRight: "75px",
               }}
             >
               ACTION
@@ -330,10 +404,10 @@ export const Filiallar = () => {
                 key={item.id}
                 className="flex bg-white px-4 py-3 rounded-lg shadow-md hover:shadow-lg"
               >
-                <div className="flex w-[290px]">
+                <div className="flex w-[315px]">
                   <Typography
                     style={{
-                      marginLeft: "20px",
+                      // marginLeft: "20px",
                       fontSize: "15px",
                       color: "#2D3A45",
                       display: "flex",
@@ -343,7 +417,7 @@ export const Filiallar = () => {
                     {item.nameUz}
                   </Typography>
                 </div>{" "}
-                <div className="flex w-[290px]">
+                <div className="flex w-[340px]">
                   <Typography
                     style={{
                       marginLeft: "20px",
@@ -356,7 +430,7 @@ export const Filiallar = () => {
                     {item.nameRu}
                   </Typography>
                 </div>{" "}
-                <div className="flex w-[290px]">
+                <div className="flex w-[280px]">
                   <Typography
                     style={{
                       marginLeft: "20px",
@@ -369,7 +443,7 @@ export const Filiallar = () => {
                     {item.location}
                   </Typography>
                 </div>{" "}
-                <div className="flex w-[290px]">
+                <div className="flex w-[300px]">
                   <Typography
                     style={{
                       marginLeft: "20px",
@@ -382,7 +456,15 @@ export const Filiallar = () => {
                     {item.hours}
                   </Typography>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-2">
+                  <div
+                    onClick={() => showDrawer(item, item.geometry, "map")}
+                    className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"
+                  >
+                    <div className="w-[32px] h-[32px] bg-white rounded-full  flex justify-center content-center items-center">
+                      <FiMapPin style={{ fontSize: "16px" }} />
+                    </div>
+                  </div>
                   <div
                     onClick={() => showDrawer(item)}
                     className="w-[40px] h-[40px] bg-[#edeff3] rounded-full flex justify-center content-center items-center"

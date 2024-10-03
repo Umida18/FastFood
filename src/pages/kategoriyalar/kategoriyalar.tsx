@@ -220,9 +220,13 @@ export const Kategoriyalar = () => {
           </Form.Item>
           <div>
             <Button
-              type="primary"
               htmlType="submit"
-              style={{ backgroundColor: "#20D472", border: "none" }}
+              style={{
+                backgroundColor: "#20D472",
+                border: "none",
+                marginTop: "20px",
+                color: "white",
+              }}
             >
               {editingCatId ? "Yangilash" : "Saqlash"}
             </Button>

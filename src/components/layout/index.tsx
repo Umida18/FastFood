@@ -20,86 +20,48 @@ const { Header, Content, Footer, Sider } = AntLayout;
 const items = [
   {
     key: "buyurtmalar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <FaRegCircleCheck className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/buyurtmalar">Buyurtmalar</Link>,
+    icon: <FaRegCircleCheck className="text-gray-600" />,
+    label: <Link to="/layout/buyurtmalar">Buyurtmalar</Link>,
   },
   {
     key: "maxsulotlar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <HiOutlineArchiveBox className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/maxsulotlar">Maxsulotlar</Link>,
+    icon: <HiOutlineArchiveBox className="text-gray-600" />,
+    label: <Link to="/layout/maxsulotlar">Maxsulotlar</Link>,
   },
   {
     key: "kategoriyalar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <VscChecklist className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/kategoriyalar">Kategoriyalar</Link>,
+    icon: <VscChecklist className="text-gray-600" />,
+    label: <Link to="/layout/kategoriyalar">Kategoriyalar</Link>,
   },
   {
     key: "filiallar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <IoLocationOutline className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/filiallar">Filiallar</Link>,
+    icon: <IoLocationOutline className="text-gray-600" />,
+    label: <Link to="/layout/filiallar">Filiallar</Link>,
   },
   {
     key: "mijozlar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <MdOutlinePeopleAlt className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/mijozlar">Mijozlar</Link>,
+    icon: <MdOutlinePeopleAlt className="text-gray-600" />,
+    label: <Link to="/layout/mijozlar">Mijozlar</Link>,
   },
   {
     key: "xisobot",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <LuBarChart2 className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/xisobot">Xisobot</Link>,
+    icon: <LuBarChart2 className="text-gray-600" />,
+    label: <Link to="/layout/xisobot">Xisobot</Link>,
   },
   {
     key: "hodimlar",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <FaPeopleGroup className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/hodimlar">Hodimlar</Link>,
+    icon: <FaPeopleGroup className="text-gray-600" />,
+    label: <Link to="/layout/hodimlar">Hodimlar</Link>,
   },
-
   {
     key: "yetkazishNarxi",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <HiOutlineArchiveBox className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/yetkazishNarxi">Yetkazish Narxi</Link>,
+    icon: <HiOutlineArchiveBox className="text-gray-600" />,
+    label: <Link to="/layout/yetkazishNarxi">Yetkazish Narxi</Link>,
   },
-
   {
     key: "xarita",
-    icon: (
-      <div className="bg-gray-100 rounded p-2">
-        <TfiLocationPin className="text-gray-600" />
-      </div>
-    ),
-    label: <Link to="/xarita">Xarita</Link>,
+    icon: <TfiLocationPin className="text-gray-600" />,
+    label: <Link to="/layout/xarita">Xarita</Link>,
   },
 ];
 
@@ -107,7 +69,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
-
   const [selectedKey, setSelectedKey] = useState([""]);
   const [openKeys, setOpenKeys] = useState([""]);
 
@@ -115,7 +76,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
     setSelectedKey([location.pathname.slice(1)]);
   }, []);
   const location = useLocation();
-  const path = location.pathname.split("/")[1];
+  const path = location.pathname.split("/layout/")[1];
   console.log("path", path);
 
   return (
@@ -178,7 +139,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 icon: <IoExitOutline />,
                 label: (
                   <div>
-                    <Link to="/login">Chiqish</Link>
+                    <Link to="/">Chiqish</Link>
                   </div>
                 ),
               },
