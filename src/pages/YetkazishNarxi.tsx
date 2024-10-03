@@ -328,18 +328,6 @@ export const YetkazishNarxi = () => {
             ))}
           </div>
         </div>
-        <div className="flex justify-center content-center items-center my-3">
-          <Button
-            style={{
-              border: "2px solid #8D9BA8",
-              background: "transparent",
-              width: "1275px",
-              height: "40px",
-            }}
-          >
-            Yana yuklash
-          </Button>
-        </div>
       </div>
     </div>
   );
